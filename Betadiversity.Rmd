@@ -1,0 +1,70 @@
+# Principal Coordinates Analysis (PCoA)
+
+```{r pcoa, echo=FALSE, message=FALSE, fig.width=9, fig.height=5, out.width="33%", fig.show="hold", warning=FALSE}
+
+library("phyloseq")
+library("ggplot2")
+library(microbiome)
+library(vegan)
+library("cluster")
+library("igraph")
+library("RColorBrewer")
+library("gridExtra")
+library(knitr)
+library(knitcitations)
+
+theme_set(theme_bw(15))
+
+method <- "PCoA"
+trans <- "compositional"
+distance <- "bray"
+phy <- readRDS("../../inputdata/processed/phyloseq/phyloseq.RDS")
+
+p <- plot_landscape(microbiome::transform(phy , "compositional"),
+                    distance = distance,
+                    method = method,
+                    size = 3,
+                    col = "Age",
+                    shading = FALSE) +
+  scale_colour_brewer(palette = "Set1")		    
+print(p)
+
+p1 <- plot_landscape(microbiome::transform(phy , "compositional"),
+                    distance = distance,
+                    method = method,
+                    size = 3,
+                    col = "Diet",
+                    shading = FALSE) +
+  scale_colour_brewer(palette = "Set1")
+print(p1)
+
+p2 <- plot_landscape(microbiome::transform(phy , "compositional"),
+                    distance = distance,
+                    method = method,
+                    size = 3,
+                    col = "Gender",
+                    shading = FALSE) +
+  scale_colour_brewer(palette = "Set1")
+print(p2)
+
+p3 <- plot_landscape(microbiome::transform(phy , "compositional"),
+                    distance = distance,
+                    method = method,
+                    size = 3,
+                    col = "Location",
+                    shading = FALSE) +
+  scale_colour_brewer(palette = "Set1")
+print(p3)
+
+library(ggpubr)
+#jpeg(file="../../output/figure/R.jpeg")
+R <- ggarrange(p, p1, p2, p3,  
+          labels = c("Age", "Diet", "Gender", "Location"),
+          ncol = 2, nrow = 2)
+print(R)
+
+#dev.off()
+
+#knit("Betadiversity.Rmd", output = "../../code/work/Betadiversity.md")
+```
+
