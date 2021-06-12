@@ -1,0 +1,33 @@
+---
+title: "phyloseq"
+output: html_document
+---
+
+```{r phyloseq, message=FALSE, warning=FALSE, error=FALSE}
+library(ggplot2)
+library(phyloseq)
+library(dada2)
+library(readxl)
+library(dplyr)
+
+otu_mat<- read_excel("inputdata/processed/tables/OTU_table.xlsx")
+tax_mat<- read_excel("inputdata/processed/tables/Taxa_table.xlsx")
+samples_df <- read_excel("inputdata/processed/tables/Metadata.xlsx")
+
+row.names(otu_mat) <- otu_mat$OTUU
+otu_mat <- otu_mat %>% select (-OTUU)
+row.names(tax_mat) <- tax_mat$OTUU
+tax_mat <- tax_mat %>% select (-OTUU) 
+row.names(samples_df) <- samples_df$Sample
+
+otu_mat <- as.matrix(otu_mat)
+tax_mat <- as.matrix(tax_mat)
+
+OTU = otu_table(otu_mat, taxa_are_rows = TRUE)
+TAX = tax_table(tax_mat)
+sam = sample_data(as.data.frame(samples_df))
+
+phyloseq <- phyloseq(OTU, TAX, sam)
+saveRDS(phyloseq, file = "inputdata/processed/phyloseq/phyloseq.RDS")
+```
+
