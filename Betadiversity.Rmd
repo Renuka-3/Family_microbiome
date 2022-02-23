@@ -5,6 +5,8 @@ date: "02/02/2022"
 output: html_document
 ---
 
+# PCoA analysis 
+
 ```{r pcoa, echo=FALSE, message=FALSE, warning=FALSE}
 library(microbiome)
 library(phyloseq)
@@ -18,9 +20,6 @@ library(reshape2)
 #library(DESeq2)
 library(Cairo)
 library(gridExtra)
-
-opts_chunk$set(dev="CairoPNG")
-knitr::opts_chunk$set(fig.path="output/figure_pcoa/")
 
 method <- "PCoA"
 trans <- "compositional"
@@ -81,17 +80,9 @@ gridExtra::grid.arrange(p1, p2, p3, p4, p5, nrow = 2)
 ```
 
 
-
-
-```{r beta, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-
-```
-
 # PERMANOVA analysis
 
 ```{r PERMANOVA, warning=FALSE, message=FALSE, echo=FALSE}
-opts_chunk$set(dev="CairoPNG")
-knitr::opts_chunk$set(fig.path="figure_joint/")
 method <- "PCoA"
 trans <- "compositional"
 distance <- "bray"
@@ -136,12 +127,3 @@ print(perman)
 # Conclusion- 
 Here we found that geographical location is significantly accosiated with bacterial community composition.
 No significant difference were obseved in Age, Gender and Diet group.
-
-## Hierarchical clustering using Ward2 method
-
-```{r HierarchicalClustering, warning=FALSE, message=FALSE, echo=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-hc <- hclust(vegan::vegdist(t(abundances(phy)), method="bray"), method="ward.D2")
-plot(hc)
-```
-

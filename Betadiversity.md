@@ -1,9 +1,11 @@
+# PCoA analysis
+
 ## *Principal Coordinates Analysis (PCoA)*
 
 -   Ordination method: PCoA
 -   Dissimilarity measure: bray
 
-![](output/figure_pcoa/PCoA-1.png)
+![](Betadiversity_files/figure-markdown_strict/PCoA-1.png)
 
 # PERMANOVA analysis
 
@@ -17,7 +19,7 @@
     ## Terms added sequentially (first to last)
     ## 
     ##           Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)
-    ## Diet       1    0.1282 0.12825 0.44237 0.00628   0.84
+    ## Diet       1    0.1282 0.12825 0.44237 0.00628   0.89
     ## Residuals 70   20.2938 0.28991         0.99372       
     ## Total     71   20.4221                 1.00000
 
@@ -31,7 +33,7 @@
     ## Terms added sequentially (first to last)
     ## 
     ##           Df SumsOfSqs MeanSqs F.Model     R2 Pr(>F)
-    ## Age        2    0.4943 0.24714 0.85573 0.0242   0.51
+    ## Age        2    0.4943 0.24714 0.85573 0.0242   0.53
     ## Residuals 69   19.9278 0.28881         0.9758       
     ## Total     71   20.4221                 1.0000
 
@@ -45,7 +47,7 @@
     ## Terms added sequentially (first to last)
     ## 
     ##           Df SumsOfSqs MeanSqs F.Model     R2 Pr(>F)
-    ## Gender     1     0.196 0.19602 0.67841 0.0096   0.62
+    ## Gender     1     0.196 0.19602 0.67841 0.0096   0.61
     ## Residuals 70    20.226 0.28894         0.9904       
     ## Total     71    20.422                 1.0000
 
@@ -86,7 +88,3 @@
 Here we found that geographical location is significantly accosiated
 with bacterial community composition. No significant difference were
 obseved in Age, Gender and Diet group.
-
-## Hierarchical clustering using Ward2 method
-
-![](figure_joint/HierarchicalClustering-1.png)
