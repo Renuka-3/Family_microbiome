@@ -1,0 +1,24 @@
+
+```{r pcoa, echo=FALSE, message=FALSE, warning=FALSE}
+library(microbiome)
+library(phyloseq)
+library(vegan)
+library(knitr)
+library(knitcitations)
+library(microbiome)
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+library(Cairo)
+library(gridExtra)
+phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
+```
+
+
+## Hierarchical clustering using Ward2 method
+
+```{r HierarchicalClustering, warning=FALSE, message=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+hc <- hclust(vegan::vegdist(t(abundances(phy)), method="bray"), method="ward.D2")
+plot(hc)
+```
