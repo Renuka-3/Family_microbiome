@@ -29,5 +29,13 @@ sam = sample_data(as.data.frame(samples_df))
 
 phyloseq <- phyloseq(OTU, TAX, sam)
 saveRDS(phyloseq, file = "inputdata/processed/phyloseq/phyloseq.RDS")
+
+library(ape)
+random_tree = rtree(ntaxa(phyloseq), rooted=TRUE, tip.label=taxa_names(phyloseq))
+plot(random_tree)
+
+physeq = merge_phyloseq(phyloseq, random_tree)
+physeq
+saveRDS(physeq, file = "inputdata/processed/phyloseq/physeq.RDS")
 ```
 

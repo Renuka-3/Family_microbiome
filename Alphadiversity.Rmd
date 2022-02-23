@@ -1,0 +1,34 @@
+
+# Alpha diversity analysis
+
+```{r setup, include=FALSE}
+library(knitr)
+library(knitcitations) 
+library(microbiome)
+library(phyloseq)
+library(ggplot2)
+library(reshape2)
+library(tidyverse)
+library(dada2)
+library(dplyr)
+library(vegan)
+library(ggpubr)
+theme_set(theme_bw(20))
+# Was created with: source("create_phyloseq.R")
+phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
+```
+
+
+## Estimate alpha diversities
+
+```{r alpha, echo=FALSE, message=FALSE, warning=FALSE}
+A <- alpha(phy)
+df <- meta(phy)
+df <- bind_cols(df, A)
+index <- "diversity_shannon"
+df$index <- df[[index]]
+#pv <- kruskal.test(data = df, index ~ factor(Family))$p.value
+p1 <- ggplot(df, aes(x = Family, y = index, color = Family)) + geom_jitter(position=position_jitter(0.1), cex=2.0) +                     theme(legend.position="none") + 
+       labs(y = "Shannon index", x = "Family") #title = paste0("Kruskal test p=", round(pv, 2)))
+print(p1)
+```

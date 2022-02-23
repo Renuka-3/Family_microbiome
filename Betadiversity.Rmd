@@ -1,0 +1,75 @@
+---
+title: "Betadiversity"
+author: "Renuka"
+date: "02/02/2022"
+output: html_document
+---
+
+```{r beta, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(microbiome)
+library(phyloseq)
+library(vegan)
+library(Cairo)
+library(knitr)
+library(knitcitations)
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+opts_chunk$set(dev="CairoPNG")
+knitr::opts_chunk$set(fig.path="figure_joint/")
+method <- "PCoA"
+trans <- "compositional"
+distance <- "bray"
+phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
+```
+
+# PERMANOVA analysis
+
+```{r PERMANOVA, warning=FALSE, message=FALSE, echo=FALSE}
+#PERMANOVA analysis for Diet
+per <- adonis(t(otu_table(phy)) ~ Diet,
+         data = meta(phy),
+	 permutations=99,
+	 method = distance)
+print(per)
+
+#PERMANOVA analysis for Age
+pe <- adonis(t(otu_table(phy)) ~ Age,
+         data = meta(phy),
+	 permutations=99,
+	 method = distance)
+print(pe)
+
+#PERMANOVA analysis for gender
+perm <- adonis(t(otu_table(phy)) ~ Gender,
+         data = meta(phy),
+	 permutations=99,
+	 method = distance)
+print(perm)
+
+#PERMANOVA analysis for Geographical location
+perma <- adonis(t(otu_table(phy)) ~ Location,
+         data = meta(phy),
+	 permutations=99,
+	 method = distance)
+print(perma)
+
+perman <- adonis(t(otu_table(phy)) ~ Family,
+         data = meta(phy),
+	 permutations=99,
+	 method = distance)
+print(perman)
+```
+
+# Conclusion- 
+Here we found that geographical location is significantly accosiated with bacterial community composition.
+No significant difference were obseved in Age, Gender and Diet group.
+
+## Hierarchical clustering using Ward2 method
+
+```{r HierarchicalClustering, warning=FALSE, message=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+hc <- hclust(vegan::vegdist(t(abundances(phy)), method="bray"), method="ward.D2")
+plot(hc)
+```
+
