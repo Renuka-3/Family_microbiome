@@ -8,7 +8,7 @@ The project emphasize on analysis of skin microbiota in genetically related indi
 
 ### Ongoing
 
-- [ ] Alpha diversity analysis- make jitterplots of groups using Shannon index 
+- [ ] Alpha diversity analysis- jitterplots of groups using Shannon index 
 
 ### Completed ✓
 
