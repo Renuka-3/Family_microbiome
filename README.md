@@ -3,12 +3,11 @@ The project emphasize on analysis of skin microbiota in genetically related indi
 
 ### Todo
 
-- [ ] PERMANOVA analysis by adjusting P values for multiple testing 
 - [ ] Random forest analysis for family predictions
 
 ### Ongoing
 
-- [ ] Alpha diversity analysis- jitterplots of groups using Shannon index 
+- [ ] PERMANOVA analysis by adjusting P values for multiple testing 
 
 ### Completed ✓
 
