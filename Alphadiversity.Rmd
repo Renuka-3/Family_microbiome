@@ -13,6 +13,7 @@ library(dada2)
 library(dplyr)
 library(vegan)
 library(ggpubr)
+library(gridExtra)
 theme_set(theme_bw(20))
 # Was created with: source("create_phyloseq.R")
 phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
@@ -20,6 +21,8 @@ phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
 
 
 ## Estimate alpha diversities
+
+### with respect to Family
 
 ```{r alpha, echo=FALSE, message=FALSE, warning=FALSE}
 A <- alpha(phy)
@@ -30,5 +33,67 @@ df$index <- df[[index]]
 #pv <- kruskal.test(data = df, index ~ factor(Family))$p.value
 p1 <- ggplot(df, aes(x = Family, y = index, color = Family)) + geom_jitter(position=position_jitter(0.1), cex=2.0) +                     theme(legend.position="none") + 
        labs(y = "Shannon index", x = "Family") #title = paste0("Kruskal test p=", round(pv, 2)))
-print(p1)
+#print(p1)
+```
+
+### Diet
+
+```{r alpha Diet, echo=FALSE, message=FALSE, warning=FALSE}
+#A <- alpha(phy)
+df <- meta(phy)
+df <- bind_cols(df, A)
+index <- "diversity_shannon"
+df$index <- df[[index]]
+##ppv <- kruskal.test(data = df, index ~ factor(Diet))$p.value
+p2 <- ggplot(df, aes(x = Diet, y = index, color = Diet)) + geom_jitter(position=position_jitter(0.1), cex=2.0) +                     theme(legend.position="none") + #theme(scale_x_discrete(limits = c("Mixed", "Veg"),labels = c("Mixed", "Vegetarian"))) +  
+       labs(y = "Shannon index", x = "Diet") #+ title = paste0 "Kruskal test p="", round(pv, 2))
+#print(p2)
+```
+
+### Age
+
+```{r alpha age, echo=FALSE, message=FALSE, warning=FALSE}
+#A <- alpha(phy)
+df <- meta(phy)
+df <- bind_cols(df, A)
+index <- "diversity_shannon"
+df$index <- df[[index]]
+#pv <- kruskal.test(data = df, index ~ factor(Family))$p.value
+p3 <- ggplot(df, aes(x = Age, y = index, color = Age)) + geom_jitter(position=position_jitter(0.1), cex=2.0) +                     theme(legend.position="none") + 
+           theme(axis.title.x = element_text()) + #scale_x_discrete(limits = c("Adult", "Elderly", "Middle_age"), labels = c("Adult", "Elderly", "Middle age")) +
+       labs(y = "Shannon index", x = "Age") #title = paste0("Kruskal test p=", round(pv, 2)))
+#print(p3)
+```
+
+### Gender
+
+```{r alpha gender, echo=FALSE, message=FALSE, warning=FALSE}
+#A <- alpha(phy)
+df <- meta(phy)
+df <- bind_cols(df, A)
+index <- "diversity_shannon"
+df$index <- df[[index]]
+##ppv <- kruskal.test(data = df, index ~ factor(Diet))$p.value
+p4 <- ggplot(df, aes(x = Gender, y = index, color = Gender)) + geom_jitter(position=position_jitter(0.1), cex=2.0)                     + theme(legend.position="none") +  
+       labs(y = "Shannon index", x = "Gender") #+ title = paste0 "Kruskal test p="", round(pv, 2))
+#print(p4)
+```
+
+### Geographical Location
+
+```{r alpha location, echo=FALSE, message=FALSE, warning=FALSE, fig.width=13, fig.height=7}
+#A <- alpha(phy
+df <- meta(phy)
+df <- bind_cols(df, A)
+index <- "diversity_shannon"
+df$index <- df[[index]]
+##ppv <- kruskal.test(data = df, index ~ factor(Diet))$p.value
+p5 <- ggplot(df, aes(x = Location, y = index, color = Location)) + 
+        geom_jitter(position=position_jitter(0.1), cex=2.0) +                   
+        theme(legend.position="none") +  
+       labs(y = "Shannon index", x = "Location") #+ title = paste0 "Kruskal test p="", round(pv, 2))
+#print(p5)
+
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, p5, nrow = 2)
 ```

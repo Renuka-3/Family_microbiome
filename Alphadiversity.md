@@ -2,4 +2,14 @@
 
 ## Estimate alpha diversities
 
-![](Alphadiversity_files/figure-markdown_strict/alpha-1.png)
+### with respect to Family
+
+### Diet
+
+### Age
+
+### Gender
+
+### Geographical Location
+
+![](Alphadiversity_files/figure-markdown_strict/alpha%20location-1.png)
