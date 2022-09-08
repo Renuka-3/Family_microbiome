@@ -32,7 +32,13 @@ saveRDS(phyloseq, file = "inputdata/processed/phyloseq/phyloseq.RDS")
 
 library(ape)
 random_tree = rtree(ntaxa(phyloseq), rooted=TRUE, tip.label=taxa_names(phyloseq))
+ape::write.tree(random_tree, file='famtree.nwk')
 plot(random_tree)
+#new worked# famtree <- ape::read.tree("famtree.nwk")
+#trying to built tree# tse <- TreeSummarizedExperiment(assays = list(counts = counts_trimmed),
+                                colData = samples,
+                                rowData = tax,
+                                rowTree = tree)
 
 physeq = merge_phyloseq(phyloseq, random_tree)
 physeq

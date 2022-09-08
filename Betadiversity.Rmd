@@ -86,37 +86,41 @@ gridExtra::grid.arrange(p1, p2, p3, p4, p5, nrow = 2)
 method <- "PCoA"
 trans <- "compositional"
 distance <- "bray"
+p_adj_method <- "BH"
+alpha <- 0.05
+results <- list()
 phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
 
 
-#PERMANOVA analysis for Diet
+# PERMANOVA analysis for Diet
 per <- adonis(t(otu_table(phy)) ~ Diet,
          data = meta(phy),
 	 permutations=99,
 	 method = distance)
 print(per)
 
-#PERMANOVA analysis for Age
+ # PERMANOVA analysis for Age
 pe <- adonis(t(otu_table(phy)) ~ Age,
          data = meta(phy),
 	 permutations=99,
 	 method = distance)
 print(pe)
 
-#PERMANOVA analysis for gender
+# PERMANOVA analysis for gender
 perm <- adonis(t(otu_table(phy)) ~ Gender,
          data = meta(phy),
 	 permutations=99,
 	 method = distance)
 print(perm)
 
-#PERMANOVA analysis for Geographical location
+# PERMANOVA analysis for Geographical location
 perma <- adonis(t(otu_table(phy)) ~ Location,
          data = meta(phy),
 	 permutations=99,
 	 method = distance)
 print(perma)
 
+# PERMANOVA analysis for Family
 perman <- adonis(t(otu_table(phy)) ~ Family,
          data = meta(phy),
 	 permutations=99,

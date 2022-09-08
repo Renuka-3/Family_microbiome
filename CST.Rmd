@@ -60,11 +60,11 @@ We will use the gap statistic to indicate the number of clusters in this data:
 ```{r gap-stat_CLR, message=FALSE, echo=FALSE, warning=FALSE}
 NDIM <- which(cumsum(evs^2/sum(evs^2)) > 0.9) - 1 # Pick components so that we reach 90% information
 x <- ord$vectors[,1:NDIM]  # rows=sample, cols=MDS axes, entries = value
-pamPCoA = function(x, k) {
-  list(cluster = pam(x[,1:2], k, cluster.only = TRUE))
-}
-gs <- clusGap(x, FUN = pamPCoA, K.max = 12, B = 50)
-plot_clusgap(gs) + scale_x_continuous(breaks=c(seq(0, 12, 2)))
+#pamPCoA = function(x, k) {
+#  list(cluster = pam(x[,1:2], k, cluster.only = TRUE))
+#}
+#gs <- clusGap(x, FUN = pamPCoA, K.max = 12, B = 50)
+#plot_clusgap(gs) + scale_x_continuous(breaks=c(seq(0, 12, 2)))
 ```
 
 
