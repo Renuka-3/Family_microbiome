@@ -18,4 +18,4 @@ The project emphasize on analysis of skin microbiota in genetically related indi
 - [x] [CST analysis](CST.md): Community state types analysis performed on geographical location.
 
 #### Analysis status document
-[Analysis status](Analysis status.doc)
+* [Analysis status](Analysis status.docx)
