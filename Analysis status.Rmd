@@ -6,6 +6,7 @@ output: word_document
 ---
 
 
+
 **Completed tasks**
 
 1. Phyloseq: Create phyloseq object using metadata, OTU table and taxa table
@@ -17,7 +18,6 @@ output: word_document
 **ToDo**
 
 1. Random forest analysis for family predictions
-2. PERMANOVA analysis by adjusting P values for multiple testing
 
 **Needs to be discuss**
 

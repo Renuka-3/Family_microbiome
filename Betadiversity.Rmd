@@ -82,52 +82,28 @@ gridExtra::grid.arrange(p1, p2, p3, p4, p5, nrow = 2)
 
 # PERMANOVA analysis
 
-```{r PERMANOVA, warning=FALSE, message=FALSE, echo=FALSE}
+```{r PERMANOVA, warning=FALSE, echo=FALSE, massage=FALSE}
 method <- "PCoA"
 trans <- "compositional"
 distance <- "bray"
 p_adj_method <- "BH"
 alpha <- 0.05
-results <- list()
 phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
 
+# PERMANOVA analysis for all co-factors
 
-# PERMANOVA analysis for Diet
-per <- adonis(t(otu_table(phy)) ~ Diet,
+trans <- "compositional"
+distance <- "bray"
+p_adj_method <- "BH"
+alpha <- 0.05
+results <- list()
+p <- adonis(t(otu_table(phy)) ~ Diet + Age + Gender + Location + Family,
          data = meta(phy),
-	 permutations=99,
+	 permutations=199,
 	 method = distance)
-print(per)
-
- # PERMANOVA analysis for Age
-pe <- adonis(t(otu_table(phy)) ~ Age,
-         data = meta(phy),
-	 permutations=99,
-	 method = distance)
-print(pe)
-
-# PERMANOVA analysis for gender
-perm <- adonis(t(otu_table(phy)) ~ Gender,
-         data = meta(phy),
-	 permutations=99,
-	 method = distance)
-print(perm)
-
-# PERMANOVA analysis for Geographical location
-perma <- adonis(t(otu_table(phy)) ~ Location,
-         data = meta(phy),
-	 permutations=99,
-	 method = distance)
-print(perma)
-
-# PERMANOVA analysis for Family
-perman <- adonis(t(otu_table(phy)) ~ Family,
-         data = meta(phy),
-	 permutations=99,
-	 method = distance)
-print(perman)
+p$aov.tab
 ```
 
 # Conclusion- 
-Here we found that geographical location is significantly accosiated with bacterial community composition.
-No significant difference were obseved in Age, Gender and Diet group.
+Here we found that geographical location and families are significantly associated with bacterial community composition.
+No significant difference were observed in Age, Gender and Diet group.
