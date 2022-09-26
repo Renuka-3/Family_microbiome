@@ -1,10 +1,6 @@
 # Family microbiome
 The project emphasize on analysis of skin microbiota in genetically related individuals.
 
-### Todo
-
-- [ ] Random forest analysis for family predictions
-
 ### Ongoing
 
 - [ ] Random forest analysis for family predictions
