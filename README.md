@@ -7,7 +7,7 @@ The project emphasize on analysis of skin microbiota in genetically related indi
 
 ### Ongoing
 
-- [ ] PERMANOVA analysis by adjusting P values for multiple testing 
+- [ ] Random forest analysis for family predictions
 
 ### Completed ✓
 
