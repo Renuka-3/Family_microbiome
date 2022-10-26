@@ -12,6 +12,7 @@ The project emphasize on analysis of skin microbiota in genetically related indi
 - [x] [Hierarchial Clustering](HierarchialClustering.md): Hierarchial Clustering carried out using Ward2 method.
 - [x] [Alpha diversity analysis](Alphadiversity.md): alpha diversity estimated using Shannon diversity index for all co-factors.
 - [x] [CST analysis](CST.md): Community state types analysis performed on geographical location.
+- [x] [Taxonomy profile](Taxonomyprofile.md): Core microbiome analysis is perfomred on skin microbiota.
 
 #### Analysis status document
 - [ ] [Analysis-status](Analysis-status.md)
