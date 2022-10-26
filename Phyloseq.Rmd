@@ -10,9 +10,9 @@ library(dada2)
 library(readxl)
 library(dplyr)
 
-otu_mat<- read_excel("inputdata/processed/tables/OTU_table.xlsx")
-tax_mat<- read_excel("inputdata/processed/tables/Taxa_table.xlsx")
-samples_df <- read_excel("inputdata/processed/tables/Metadata.xlsx")
+otu_mat<- read_excel("inputdata/processed/tables_new/OTU_table.xlsx")
+tax_mat<- read_excel("inputdata/processed/tables_new/Taxa_table.xlsx")
+samples_df <- read_excel("inputdata/processed/tables_new/Metadata.xlsx")
 
 row.names(otu_mat) <- otu_mat$OTUU
 otu_mat <- otu_mat %>% select (-OTUU)
@@ -27,11 +27,11 @@ OTU = otu_table(otu_mat, taxa_are_rows = TRUE)
 TAX = tax_table(tax_mat)
 sam = sample_data(as.data.frame(samples_df))
 
-phyloseq <- phyloseq(OTU, TAX, sam)
-saveRDS(phyloseq, file = "inputdata/processed/phyloseq/phyloseq.RDS")
+phyloseqnew <- phyloseq(OTU, TAX, sam)
+saveRDS(phyloseq, file = "inputdata/processed/phyloseq/phyloseqnew.RDS")
 
 library(ape)
-random_tree = rtree(ntaxa(phyloseq), rooted=TRUE, tip.label=taxa_names(phyloseq))
+random_tree = rtree(ntaxa(phyloseqnew), rooted=TRUE, tip.label=taxa_names(phyloseqnew))
 ape::write.tree(random_tree, file='famtree.nwk')
 plot(random_tree)
 #new worked# famtree <- ape::read.tree("famtree.nwk")
@@ -40,8 +40,10 @@ plot(random_tree)
                                 rowData = tax,
                                 rowTree = tree)
 
-physeq = merge_phyloseq(phyloseq, random_tree)
-physeq
-saveRDS(physeq, file = "inputdata/processed/phyloseq/physeq.RDS")
+physeqnew = merge_phyloseq(phyloseqnew, random_tree)
+physeqnew
+saveRDS(physeqnew, file = "inputdata/processed/phyloseq/physeqnew.RDS")
+
+temp <- filter_taxa(physeqnew, function (x) {sum(x > 0) > 1}, prune=TRUE)
 ```
 

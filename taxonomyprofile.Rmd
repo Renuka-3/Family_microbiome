@@ -1,0 +1,115 @@
+---
+title: "taxonomyprofile"
+author: "Renuka"
+date: "2022-10-15"
+output: html_document
+---
+
+```{r taxonomypicture, include=FALSE}
+library(microbiome)
+library(phyloseq)
+library(ggplot2)
+library(reshape2)
+library(tidyverse)
+library(dada2)
+library(knitr)
+require(knitcitations)
+theme_set(theme_bw(20))
+knitr::opts_chunk$set(fig.width=10, fig.height=10, message=FALSE, warning=FALSE)
+core_detection <- .1/100
+core_prevalence <- 20/100
+# Was created with: source("create_phyloseq.R")
+physeqnew <- readRDS("inputdata/processed/phyloseq/physeqnew.RDS")
+temp.phy <- filter_taxa(physeqnew, function (x) {sum(x > 0) > 1}, prune=TRUE)
+
+#summarize_phyloseq(temp.phy)
+#get_taxa_unique(temp.phy, "Genus")
+```
+
+
+
+# Core microbiota.
+
+Core microbiota is here defined based on the following parameters:
+
+  * Detection threshold (relative abundance): `r 100 * core_detection`%
+  * Prevalence threshold (above threshold in the population) `r 100 * core_prevalence`%.
+
+The following taxonomic groups are in the core genera. Mean relative abundance and population prevalence (above detection threshold) are shown.
+
+
+Phylum abundance table (relative abundance % and prevalance):
+
+```{r core_phyla, echo=FALSE, message=FALSE, fig.width=10, fig.height=8, out.width="50%"}
+ps <- aggregate_taxa(temp.phy, "Phylum")
+ps <- microbiome::transform(ps, "compositional")
+ps.core <- core(ps, detection = core_detection, prevalence = core_prevalence)
+m <- round(100 * rowMeans(abundances(ps.core)), 1)
+#median <- round(100 * apply(abundances(ps.core), 1, median), 1)
+###sd <- round(100 * apply(abundances(ps.core), 1, sd), 1)
+sd <- round(apply(abundances(ps.core), 1, sd), 2)
+###sd <- sd(abundances(ps.core))
+prev <- round(100 * prevalence(ps.core, detection = core_detection), 1)
+d <- as.data.frame(list(Taxon = names(m), Abundance_mean = m, Prevalence = prev, sd = sd))
+rownames(d) <- NULL
+d <- d %>% arrange(desc(Abundance_mean), desc(Prevalence))
+colnames(d) <- c("Taxon", "Mean Relative abundance (%)", "Prevalence (%)", "Standard deviation")
+kable(d)
+#l <- ggplot(d, x= Taxon, y= Mean Relative Abundance)+ geom_bar()
+```
+
+## Genus abundance table (relative abundance % and prevalance):
+
+```{r core_genera, echo=FALSE, message=FALSE, results='hide', fig.width=10, fig.height=8, out.width="50%"}
+ps <- aggregate_taxa(temp.phy, "Genus")
+ps <- microbiome::transform(ps, "compositional")
+ps.core <- core(ps, detection = core_detection, prevalence = core_prevalence)
+m <- round(100 * rowMeans(abundances(ps.core)), 1)
+median <- round(100 * apply(abundances(ps.core), 1, median), 1)
+prev <- round(100 * prevalence(ps.core, detection = core_detection), 1)
+d <- as.data.frame(list(Taxon = names(m), Abundance_mean = m, Abundance_median = median, Prevalence = prev))
+rownames(d) <- NULL
+d <- d %>% arrange(desc(Abundance_mean), desc(Prevalence))
+colnames(d) <- c("Taxon", "Mean Relative abundance (%)", "Median Relative abundance (%)", "Prevalence (%)")
+kable(d)
+```
+
+
+## Abundance variation across samples for each core taxa.
+
+
+```{r core_rank_abundance, echo=FALSE, message=FALSE, fig.width=6, fig.height=4, fig.show="hold"}
+theme_set(theme_bw(base_size = 13))
+dfm <- melt(abundances(ps.core))
+dfm$Var1 <- factor(dfm$Var1, levels = rev(d$Taxon))
+dfm$Var_new = str_wrap(dfm$Var1, width = 40)
+p2 <- ggplot(dfm, aes(x = Var_new, y = value)) +
+       geom_boxplot() +
+       geom_jitter(width = 0.1) +       
+       scale_y_log10(label = scales::percent) +
+       coord_flip() + theme(legend.position="none") +
+       labs(y = "Relative abundance (%)", x = '', title = "Core abundance variation")
+print(p2)
+```
+## Phyla level individual relative abundance bar graph
+
+```{r chunk label, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=6}
+transform <- microbiome::transform
+j <- transform(temp.phy, "compositional")
+sp <- aggregate_taxa(j, "Genus")
+o <- aggregate_rare(sp, level = 'Genus',detection = 0.1/100, prevalence = 20/100, include.lowest =TRUE)
+phyla.ordering <- names(sort(rowMeans(abundances(transform(o, "compositional")))))
+df <- psmelt(o)
+#df$Phylum <- factor(df$phylum, levels=phyla.ordering)
+sorted.samples.by.Staphylococcus <- unlist(subset(df, Genus=="Staphylococcus") %>% arrange(Abundance) %>% select(Sample))
+df$Sample <- factor(df$Sample, levels = sorted.samples.by.Staphylococcus)
+#w <- df %>% filter (Family=="A")
+#f <- ggplot(w, aes(x = Sample, fill = Genus, y = Abundance)) + geom_bar(stat = "identity", colour = "black") + 
+            labs(y =  "Relative abundance (%)", x = "Individuals") + scale_y_continuous(label=scales::percent) + scale_fill_brewer("Phylum", palette = "Set3") + facet_grid(Family ~ .) + facet_grid(cols = vars(Family)) + theme(axis.text.x = element_blank(),legend.position = "none") 
+#print(f)
+
+pl <- ggplot(df, aes(x=Family, fill= Genus, y= Abundance))+ geom_bar(stat = "identity", colour = "black") + labs(y =  "Relative abundance (%)", x = "Family") + scale_y_continuous(label=scales::percent) 
+print(pl)
+```
+
+

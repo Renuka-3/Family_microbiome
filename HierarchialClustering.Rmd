@@ -11,7 +11,8 @@ library(dplyr)
 library(reshape2)
 library(Cairo)
 library(gridExtra)
-phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
+physeqnew <- readRDS("inputdata/processed/phyloseq/physeqnew.RDS")
+temp.phy <- filter_taxa(physeqnew, function (x) {sum(x > 0) > 1}, prune=TRUE)
 ```
 
 
@@ -19,6 +20,6 @@ phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
 
 ```{r HierarchicalClustering, warning=FALSE, message=FALSE, echo=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-hc <- hclust(vegan::vegdist(t(abundances(phy)), method="bray"), method="ward.D2")
+hc <- hclust(vegan::vegdist(t(abundances(temp.phy)), method="bray"), method="ward.D2")
 plot(hc)
 ```

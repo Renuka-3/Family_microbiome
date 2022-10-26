@@ -24,7 +24,8 @@ library(gridExtra)
 method <- "PCoA"
 trans <- "compositional"
 distance <- "bray"
-phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
+physeqnew <- readRDS("inputdata/processed/phyloseq/physeqnew.RDS")
+temp.phy <- filter_taxa(physeqnew, function (x) {sum(x > 0) > 1}, prune=TRUE)
 ```
 
 ## *Principal Coordinates Analysis (PCoA)*
@@ -35,7 +36,7 @@ phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
 ```{r PCoA, echo=FALSE, message=FALSE, fig.width=25, fig.height=20, fig.show="hold", warning=FALSE}
 theme_set(theme_bw(30))
 
-p1 <- plot_landscape(microbiome::transform(phy, "compositional"),
+p1 <- plot_landscape(microbiome::transform(temp.phy, "compositional"),
                     distance = distance,
                     method = method,
                     size = 5,
@@ -44,7 +45,7 @@ p1 <- plot_landscape(microbiome::transform(phy, "compositional"),
   scale_colour_brewer(palette = "Set1")	+ labs(title = "Diet") + theme(legend.position = 'bottom', legend.text=element_text(size=20), legend.title=element_text(size=25))
 
 
-p2 <- plot_landscape(microbiome::transform(phy, "compositional"),
+p2 <- plot_landscape(microbiome::transform(temp.phy, "compositional"),
                     distance = distance,
                     method = method,
                     size = 5,
@@ -52,7 +53,7 @@ p2 <- plot_landscape(microbiome::transform(phy, "compositional"),
                     shading = FALSE)+
   scale_colour_brewer(palette = "Set1")	+ labs(title = "Age") + theme(legend.position = 'bottom', legend.text=element_text(size=20), legend.title=element_text(size=25))
 
-p3 <- plot_landscape(microbiome::transform(phy, "compositional"),
+p3 <- plot_landscape(microbiome::transform(temp.phy, "compositional"),
                     distance = distance,
                     method = method,
                     size = 5,
@@ -60,7 +61,7 @@ p3 <- plot_landscape(microbiome::transform(phy, "compositional"),
                     shading = FALSE)+
   scale_colour_brewer(palette = "Set1")	+ labs(title = "Gender") + theme(legend.position = 'bottom', legend.text=element_text(size=20), legend.title=element_text(size=25))
 
-p4 <- plot_landscape(microbiome::transform(phy, "compositional"),
+p4 <- plot_landscape(microbiome::transform(temp.phy, "compositional"),
                     distance = distance,
                     method = method,
                     size = 5,
@@ -68,7 +69,7 @@ p4 <- plot_landscape(microbiome::transform(phy, "compositional"),
                     shading = FALSE)+
   scale_colour_brewer(palette = "Set1")	+ labs(title = "Location") + theme(legend.position = 'bottom', legend.text=element_text(size=20), legend.title=element_text(size=25))
 
-p5 <- plot_landscape(microbiome::transform(phy, "compositional"),
+p5 <- plot_landscape(microbiome::transform(temp.phy, "compositional"),
                     distance = distance,
                     method = method,
                     size = 5,
@@ -88,7 +89,7 @@ trans <- "compositional"
 distance <- "bray"
 p_adj_method <- "BH"
 alpha <- 0.05
-phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
+#phy <- readRDS("inputdata/processed/phyloseq/physeq.RDS")
 
 # PERMANOVA analysis for all co-factors
 
@@ -97,8 +98,8 @@ distance <- "bray"
 p_adj_method <- "BH"
 alpha <- 0.05
 results <- list()
-p <- adonis(t(otu_table(phy)) ~ Diet + Age + Gender + Location + Family,
-         data = meta(phy),
+p <- adonis(t(otu_table(temp.phy)) ~ Diet + Age + Gender + Location + Family,
+         data = meta(temp.phy),
 	 permutations=199,
 	 method = distance)
 p$aov.tab
