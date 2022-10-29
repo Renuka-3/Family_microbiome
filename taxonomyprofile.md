@@ -48,12 +48,13 @@ Phylum abundance table (relative abundance % and prevalance):
 </tbody>
 </table>
 
-# Genus abundance table (relative abundance % and prevalance):
+## Genus abundance table (relative abundance % and prevalance):
 
-## Abundance variation across samples for each core taxa.
+## Most prevalent genera
 
-![](taxonomyprofile_files/figure-markdown_strict/core_rank_abundance-1.png)
-\## Phyla level individual relative abundance bar graph
+![](taxonomyprofile_files/figure-markdown_strict/core_abundance-1.png)
+
+## Phyla level individual relative abundance bar graph
 
     ## NULL
 

@@ -42,7 +42,7 @@ p1 <- ggplot(df, aes(x = Family, y = index, color = Family)) +
       geom_boxplot() + theme(legend.position="top", legend.title = element_text("Stats"))  +
        geom_jitter(width = 0.1) +  
 	theme(axis.text.x = element_text(angle = 0, hjust = 0.5),axis.title.x = element_text()) +
- labs(y = "Shannon Diversity", x = "", title = "Family") 
+ labs(y = "Shannon Diversity", x = "", title = "Family") + theme(legend.position = "none")
 
 print(p1)
 ```
@@ -66,7 +66,7 @@ p2 <- ggplot(df, aes(x = Diet, y = index, color = Diet)) +
 	     x = "",
 	     title = "Diet") + geom_signif(comparisons = list(c("Mixed", "Veg")), map_signif_level = TRUE)
 
-print(p2)
+#print(p2)
 ## Multiple pairwise comparison 
 qw <- subset(df, Diet %in% c("Mixed", "Veg"))
 renu <- wilcox.test(data = qw, index ~ factor(Diet))$p.value
@@ -86,8 +86,8 @@ pv <- kruskal.test(data = df, index ~ factor(Age))$p.value
 kruskal.test(data = df, index ~factor(Age))
 p3 <- ggplot(df, aes(x = Age, y = index, color = Age)) +  geom_boxplot() + geom_jitter(position=position_jitter(0.1), cex=2.0) +                     theme(legend.position="none") + 
            theme(axis.title.x = element_text()) + scale_x_discrete(limits = c("Adult", "Elderly", "Middle_age"), labels = c("Adult", "Elderly", "Middle age")) +
-       labs(y = "Shannon index", x = "Age", title = "Age") + geom_signif(comparisons = list(c("Mixed", "Veg")), map_signif_level = TRUE) 
-print(p3)
+       labs(y = "Shannon Diversity", x = "Age", title = "Age") + geom_signif(comparisons = list(c("Mixed", "Veg")), map_signif_level = TRUE) 
+#print(p3)
 
 ## Multiple pairwise comparison 
 RE <- subset(df, Age %in% c("Adult", "Middle_age"))
@@ -118,59 +118,34 @@ p4 <- ggplot(df, aes(x = Gender, y = index, color = Gender)) +
 	theme(axis.text.x = element_text(angle = 0, hjust = 0.5),axis.title.x = element_text()) +theme(legend.position = "none")+
         labs(y = "Shannon Diversity",
 	     x = "",
-	     title = "Gender") + geom_signif(comparisons = list(c("Male", "Female")), map_signif_level = TRUE)
-print(p4)
+	     title = "Gender") #+ geom_signif(comparisons = list(c("Male", "Female")), map_signif_level = TRUE)
+#print(p4)
 ```
 
 ### Geographical Location
 
-```{r alpha location, echo=FALSE, message=FALSE, warning=FALSE, fig.width=13, fig.height=7}
-#A <- alpha(temp.phy)
+
+```{r diffab, echo=FALSE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=7, fig.show="keep", out.width="60%"}
 df <- meta(temp.phy)
 df <- bind_cols(df, A)
 index <- "diversity_shannon"
-df$index <- df[[index]]
-vp <- wilcox.test(data = df, index ~ factor(Location))$p.value
-wilcox.test(data = df, index ~ factor(Location))
-p5 <- ggplot(df, aes(x = Location, y = index, color = Location)) + geom_boxplot() +
-        geom_jitter(position=position_jitter(0.1), cex=2.0) +                   
-        theme(legend.position="none") +  
-       labs(y = "Shannon index", x = "Location") #+ title = paste0 "Kruskal test p="", round(pv, 2))
-print(p5)
-
-library(gridExtra)
-grid.arrange(p1, p2, p3, p4, p5, nrow = 2)
-
-A <- alpha(temp.phy)
-b <- meta(temp.phy)
-b2 <- bind_cols(b,A)
-is.data.frame(b) 
-is.data.frame(b2)
-z<- sapply(split(b2$diversity_shannon, b2$Location), mean)
-f <- sapply(split(b2$diversity_shannon, b2$Location), sd) 
-v <- cbind(z,f)
-kable(v)
-```
-
-
-```{r diffab, echo=FALSE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=6, fig.height=6, fig.show="keep", out.width="50%"}
-df <- meta(temp.phy)
-df <- bind_cols(df, A)
 df$index <- df[[index]]
 pv <- wilcox.test(data = df, index ~ factor(Location))$p.value
 wilcox.test(data = df, index ~factor(Location))
 library(ggbeeswarm)
 library(ggsignif)
-p1 <- ggplot(df, aes(x = Location, y = index)) +
+p5 <- ggplot(df, aes(x = Location, y = index, color = Location)) +
        geom_boxplot() + theme(legend.position="top", legend.title = element_text("Stats"))  +
        geom_jitter(width = 0.1) +  
         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) + theme(legend.position = "none")+
-        labs(y = "Shannon Diversity", x = "", title = "Geographical location") + 
+        labs(y = "Shannon Diversity", x = "", title = "Geographical location") #+ 
         geom_signif(comparisons = list(c("Ahmednagar", "Pune")), map_signif_level = TRUE) 
-print(p1)
+#print(p5)
 
 qw <- subset(df, Location %in% c("Ahmednagar", "Pune"))
 renu <- wilcox.test(data = qw, index ~ factor(Location))$p.value
 wilcox.test(data = qw, index ~factor(Location))
 p.adjust(c(0.001,0.01,0.05,0.1), method = "bonferroni")
-```  
+
+gridExtra::grid.arrange(p2, p3, p4, p5, nrow = 2)
+```
