@@ -125,7 +125,7 @@ p4 <- ggplot(df, aes(x = Gender, y = index, color = Gender)) +
 ### Geographical Location
 
 
-```{r diffab, echo=FALSE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=7, fig.show="keep", out.width="60%"}
+```{r diffab, echo=FALSE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5, fig.show="keep", out.width="60%"}
 df <- meta(temp.phy)
 df <- bind_cols(df, A)
 index <- "diversity_shannon"
@@ -147,5 +147,5 @@ renu <- wilcox.test(data = qw, index ~ factor(Location))$p.value
 wilcox.test(data = qw, index ~factor(Location))
 p.adjust(c(0.001,0.01,0.05,0.1), method = "bonferroni")
 
-gridExtra::grid.arrange(p2, p3, p4, p5, nrow = 2)
+gridExtra::grid.arrange(p2, p3, p4, p5, nrow = 1)
 ```

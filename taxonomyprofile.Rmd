@@ -21,7 +21,6 @@ core_prevalence <- 20/100
 # Was created with: source("create_phyloseq.R")
 physeqnew <- readRDS("inputdata/processed/phyloseq/physeqnew.RDS")
 temp.phy <- filter_taxa(physeqnew, function (x) {sum(x > 0) > 1}, prune=TRUE)
-
 #summarize_phyloseq(temp.phy)
 #get_taxa_unique(temp.phy, "Genus")
 ```
@@ -45,15 +44,15 @@ ps <- aggregate_taxa(temp.phy, "Phylum")
 ps <- microbiome::transform(ps, "compositional")
 ps.core <- core(ps, detection = core_detection, prevalence = core_prevalence)
 m <- round(100 * rowMeans(abundances(ps.core)), 1)
-#median <- round(100 * apply(abundances(ps.core), 1, median), 1)
+median <- round(100 * apply(abundances(ps.core), 1, median), 1)
 ###sd <- round(100 * apply(abundances(ps.core), 1, sd), 1)
-sd <- round(apply(abundances(ps.core), 1, sd), 2)
+#Right#sd <- round(apply(abundances(ps.core), 1, sd), 2)
 ###sd <- sd(abundances(ps.core))
 prev <- round(100 * prevalence(ps.core, detection = core_detection), 1)
-d <- as.data.frame(list(Taxon = names(m), Abundance_mean = m, Prevalence = prev, sd = sd))
+d <- as.data.frame(list(Taxon = names(m), Abundance_mean = m, Prevalence = prev, median = median))
 rownames(d) <- NULL
 d <- d %>% arrange(desc(Abundance_mean), desc(Prevalence))
-colnames(d) <- c("Taxon", "Mean Relative abundance (%)", "Prevalence (%)", "Standard deviation")
+colnames(d) <- c("Taxon", "Mean Relative abundance (%)", "Prevalence (%)", "Median")
 kable(d)
 ```
 
@@ -67,7 +66,7 @@ df <- melt(xc)
 names(df) <- c("Genus", "sample", "value")
 dfm <- df %>% group_by(Genus) %>% 
          summarise(mean = round(100 * mean(value), 1),
-	           #median = round(100 * median(value), 1),
+	           median = round(100 * median(value), 1),
 		   #min = round(100 * min(value), 1),
 		   #max = round(100 * max(value), 1),
 		   prevalence = round(100 * prevalence(value), 1),
@@ -76,7 +75,7 @@ dfm <- df %>% group_by(Genus) %>%
 kable(dfm) 
 #write.csv(dfm, file="genus table.csv")
 library(data.table)
-a <- data.table:::print.data.table(dfm, nrows = 10, topn=5)
+a <- data.table:::print.data.table(dfm, nrows = 30, topn=5)
 ```
 
 ## Most prevalent genera
@@ -100,10 +99,10 @@ bs$new <- factor(bs$new, levels=sorted.names)
 p1 <- ggplot(bs, aes(x = new, y = value)) +
        geom_boxplot() +
        geom_jitter(width = 0.1) +
-       scale_y_continuous(label = scales::percent) +   
-       #scale_y_log10(label = scales::percent) +
+       #scale_y_continuous(label = scales::percent) +   
+       scale_y_log10() +
        coord_flip() + theme(legend.position="none") +
-       labs(y = "Relative abundance (%)", x = '', title = "Most prevalent genera")
+       labs(y = "log abundance", x = '', title = "Most prevalent genera")
 print(p1)
 ```
 
@@ -122,10 +121,10 @@ sorted.samples.by.Staphylococcus <- unlist(subset(df, Genus=="Staphylococcus") %
 df$Sample <- factor(df$Sample, levels = sorted.samples.by.Staphylococcus)
 #w <- df %>% filter (Family=="A")
 #f <- ggplot(w, aes(x = Sample, fill = Genus, y = Abundance)) + geom_bar(stat = "identity", colour = "black") + 
-            labs(y =  "Relative abundance (%)", x = "Individuals") + scale_y_continuous(label=scales::percent) + scale_fill_brewer("Phylum", palette = "Set3") + facet_grid(Family ~ .) + facet_grid(cols = vars(Family)) + theme(axis.text.x = element_blank(),legend.position = "none") 
+#            labs(y =  "Relative abundance (%)", x = "Individuals") + scale_y_continuous(label=scales::percent) + scale_fill_brewer("Phylum", palette = "Set3") + facet_grid(Family ~ .) + facet_grid(cols = vars(Family)) + theme(axis.text.x = element_blank(),legend.position = "none") 
 #print(f)
 
-pl <- ggplot(df, aes(x=Family, fill= Genus, y= Abundance))+ geom_bar(stat = "identity", colour = "black") + labs(y =  "Relative abundance (%)", x = "Family") + scale_y_continuous(label=scales::percent) 
+pl <- ggplot(df, aes(x=Family, fill= Genus, y= Abundance))+ geom_bar(stat = "identity") + labs(y =  "Relative abundance (%)", x = "Family") + scale_y_continuous(label=scales::percent) 
 print(pl)
 ```
 

@@ -1,0 +1,66 @@
+---
+title: "TSE_alpha"
+author: "Renuka"
+date: "2023-03-13"
+output: html_document
+---
+
+```{r tsealpha, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, fig.width=2, fig.height=2, fig.show="keep", out.width="50%", fig.show="hold"}
+library("mia")
+fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+#Alpha diversity measures
+tse <- mia::estimateDiversity(fam_tse, 
+                              assay_name = "counts",
+                              index = "shannon", 
+                              name = "shannon")
+#head(colData(tse)$shannon)
+library(ggplot2)
+library(patchwork)
+library(ggsignif)
+df <- as.data.frame(colData(tse))
+g <- ggplot(df, aes(x = Family, y = shannon)) +    ## Shannon Diversity family-wise
+geom_boxplot(outlier.shape = NA) + 
+ geom_jitter(width = 0.05) + 
+  geom_signif(comparisons = "Family", map_signif_level = FALSE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(g)
+library(dplyr)
+COMPS <- combn(LETTERS[1:15],2, simplify = FALSE)
+res <- lapply(COMPS, function(comp) {
+    t.test(df[df$Family==comp[1],"shannon"],df[df$Family==comp[2],"shannon"])$p.value
+})
+
+f <- ggplot(df, aes(x = Family, y = shannon)) +    ## Shannon Diversity family-wise
+geom_boxplot(outlier.shape = NA) + 
+  
+  geom_jitter(width = 0.05) + 
+  geom_signif(comparisons = COMPS[res < 0.05],
+              map_signif_level = TRUE, na.rm = TRUE,
+              step_increase=0.25)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(f)
+
+
+b <- ggplot(df, aes(x = Location, y = shannon)) +    ## Shannon Diversity for Geographical_location
+geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(width = 0.05) + 
+  geom_signif(comparisons = list(c("Pune", "Ahmednagar")), map_signif_level = FALSE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))  
+
+c <- ggplot(df, aes(x = Age, y = shannon)) +    ## Shannon Diversity for age groups
+geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(width = 0.05) + 
+  geom_signif(comparisons = list(c("Adult", "Middle_age"), c("Adult","Elderly"), c("Middle_age", "Elderly")), map_signif_level = FALSE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + scale_x_discrete(limits = c("Adult","Middle_age", "Elderly"),
+                       labels = c("Adult", "Middle age", "Elderly")) +
+  theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))
+
+
+d <- ggplot(df, aes(x = Diet, y = shannon)) +    ## Shannon Diversity for diet
+geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(width = 0.05) + 
+  geom_signif(comparisons = list(c("Mixed", "Veg")), map_signif_level = FALSE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))  
+
+e <- ggplot(df, aes(x = Gender, y = shannon)) +    ## Shannon Diversity for diet
+geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(width = 0.05) + 
+  geom_signif(comparisons = list(c("Female", "Male")), map_signif_level = FALSE, na.rm = FALSE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))  
+library(gridExtra)
+gridExtra::grid.arrange(b, c, d, e, nrow = 1) 
+```
