@@ -22,6 +22,7 @@ g <- ggplot(df, aes(x = Family, y = shannon)) +    ## Shannon Diversity family-w
 geom_boxplot(outlier.shape = NA) + 
  geom_jitter(width = 0.05) + 
   geom_signif(comparisons = "Family", map_signif_level = FALSE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+
 print(g)
 library(dplyr)
 COMPS <- combn(LETTERS[1:15],2, simplify = FALSE)
@@ -63,4 +64,13 @@ geom_boxplot(outlier.shape = NA) +
   geom_signif(comparisons = list(c("Female", "Male")), map_signif_level = FALSE, na.rm = FALSE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))  
 library(gridExtra)
 gridExtra::grid.arrange(b, c, d, e, nrow = 1) 
+
+
+library(ggplot2)
+library(patchwork)
+library(ggsignif)
+df <- as.data.frame(colData(tse))
+g1 <- ggplot(df, aes(x = Sample, y = shannon, color = Family)) +    ## Shannon Diversity family-wise
+  geom_jitter(width = 0.05)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(g1)
 ```

@@ -1,1 +1,1 @@
-<img src="TSE_alpha_files/figure-markdown_strict/tsealpha-1.png" width="50%" /><img src="TSE_alpha_files/figure-markdown_strict/tsealpha-2.png" width="50%" />
+<img src="tse_alpha_files/figure-markdown_strict/tsealpha-1.png" width="50%" /><img src="tse_alpha_files/figure-markdown_strict/tsealpha-2.png" width="50%" /><img src="tse_alpha_files/figure-markdown_strict/tsealpha-3.png" width="50%" /><img src="tse_alpha_files/figure-markdown_strict/tsealpha-4.png" width="50%" />
