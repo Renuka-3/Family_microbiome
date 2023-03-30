@@ -1,0 +1,88 @@
+---
+title: "RF.rmd"
+author: "Renuka"
+date: "2023-03-24"
+output: html_document
+---
+
+
+```{r comp, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+tse <- transformCounts(fam_tse, method = "relabundance")
+tse <- runMDS(tse, FUN = vegan::vegdist, method = "bray", name = "bray", exprs_values = "relabundance")
+##tse <- calculateMDS(tse, method= "bray", FUN = vegan::vegdist,exprs_values = "relabundance")
+
+
+## two Members of same family
+d0 <- assay(tse, "relabundance")
+dx <- as.matrix(vegdist(t(d0), method="bray"))
+ran <- sample(1:5, 2)
+##dx[paste0("A", ran[[1]]), paste0("A", ran[[2]])]
+###########set.seed(1234)
+beta_compare <- function(families, dx) {
+  
+  
+  if (families[[1]] == families[[2]]) {
+    
+    endn <- sum(str_detect(rownames(dx), families[[1]]))
+    
+    my_rnd <- sample(1:endn, 2)
+    my_beta <- dx[paste0(families[[1]], my_rnd[[1]]), paste0(families[[2]], my_rnd[[2]])]
+
+    first_member <- paste0(families[[1]], my_rnd[[1]])
+    second_member <- paste0(families[[2]], my_rnd[[2]])
+    
+  } else {
+    
+    endn1 <- sum(str_detect(rownames(dx), families[[1]]))
+    endn2 <- sum(str_detect(rownames(dx), families[[2]]))
+    
+    my_rnd1 <- sample(1:endn1, 1)
+    my_rnd2 <- sample(1:endn2, 1)
+    
+    first_member <- paste0(families[[1]], my_rnd1[[1]])
+    second_member <- paste0(families[[2]], my_rnd2[[1]])
+    
+  }
+  
+  my_beta <- dx[first_member, second_member]
+  
+  return(list(my_beta,first_member, second_member))
+  
+}
+
+set.seed(2345)
+beta_values <- c()
+families1 <- c()
+families2 <- c()
+
+for (first_family in unique(tse$Family)){
+  
+  for (second_family in unique(tse$Family)){
+    
+    
+    tmp_res <- beta_compare(c(first_family, second_family ), dx)
+    beta_values <- c(beta_values, tmp_res[[1]])
+    families1 <- c(families1, tmp_res[[2]])
+    families2 <- c(families2, tmp_res[[3]])
+     
+  }
+}
+
+j <- data.frame(BetaComparison = beta_values,
+           FirstFamily = families1,
+           SecondFamily = families2)
+j<- j %>% mutate(Within = substr(FirstFamily, 1,1) == substr(SecondFamily, 1,1))
+
+library(ggsignif)
+H <- ggplot(j, aes(x = Within, y = BetaComparison)) +    
+geom_boxplot(outlier.shape = NA) + geom_jitter(width=0.05) +geom_signif(comparisons = list(c("FALSE", "TRUE")), map_signif_level = FALSE) + theme(text = element_text(size = 20)) + labs(x = "Members", y= "Dissimilarity index")
+H1<- H + scale_x_discrete(labels=c("TRUE" = "Within family", "FALSE" = "Between family")) 
+print(H1)
+```
+
