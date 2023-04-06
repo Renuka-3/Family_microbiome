@@ -43,12 +43,12 @@ print(f)
 b <- ggplot(df, aes(x = Location, y = shannon)) +    ## Shannon Diversity for Geographical_location
 geom_boxplot(outlier.shape = NA) + 
   geom_jitter(width = 0.05) + 
-  geom_signif(comparisons = list(c("Pune", "Ahmednagar")), map_signif_level = FALSE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))  
+  geom_signif(comparisons = list(c("Pune", "Ahmednagar")), map_signif_level = TRUE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))  
 
 c <- ggplot(df, aes(x = Age, y = shannon)) +    ## Shannon Diversity for age groups
 geom_boxplot(outlier.shape = NA) + 
   geom_jitter(width = 0.05) + 
-  geom_signif(comparisons = list(c("Adult", "Middle_age"), c("Adult","Elderly"), c("Middle_age", "Elderly")), map_signif_level = FALSE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + scale_x_discrete(limits = c("Adult","Middle_age", "Elderly"),
+  geom_signif(comparisons = list(c("Adult", "Middle_age"), c("Adult","Elderly"), c("Middle_age", "Elderly")), map_signif_level = TRUE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + scale_x_discrete(limits = c("Adult","Middle_age", "Elderly"),
                        labels = c("Adult", "Middle age", "Elderly")) +
   theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))
 
@@ -56,12 +56,12 @@ geom_boxplot(outlier.shape = NA) +
 d <- ggplot(df, aes(x = Diet, y = shannon)) +    ## Shannon Diversity for diet
 geom_boxplot(outlier.shape = NA) + 
   geom_jitter(width = 0.05) + 
-  geom_signif(comparisons = list(c("Mixed", "Veg")), map_signif_level = FALSE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))  
+  geom_signif(comparisons = list(c("Mixed", "Veg")), map_signif_level = TRUE, na.rm = TRUE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))  
 
 e <- ggplot(df, aes(x = Gender, y = shannon)) +    ## Shannon Diversity for diet
 geom_boxplot(outlier.shape = NA) + 
   geom_jitter(width = 0.05) + 
-  geom_signif(comparisons = list(c("Female", "Male")), map_signif_level = FALSE, na.rm = FALSE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))  
+  geom_signif(comparisons = list(c("Female", "Male")), map_signif_level = TRUE, na.rm = FALSE)  + ylab("Shannon") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20))  
 library(gridExtra)
 gridExtra::grid.arrange(b, c, d, e, nrow = 1) 
 

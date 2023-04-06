@@ -80,9 +80,14 @@ j <- data.frame(BetaComparison = beta_values,
 j<- j %>% mutate(Within = substr(FirstFamily, 1,1) == substr(SecondFamily, 1,1))
 
 library(ggsignif)
-H <- ggplot(j, aes(x = Within, y = BetaComparison)) +    
+H <- ggplot(j, aes(x = Within, y = BetaComparison)) +   
 geom_boxplot(outlier.shape = NA) + geom_jitter(width=0.05) +geom_signif(comparisons = list(c("FALSE", "TRUE")), map_signif_level = FALSE) + theme(text = element_text(size = 20)) + labs(x = "Members", y= "Dissimilarity index")
-H1<- H + scale_x_discrete(labels=c("TRUE" = "Within family", "FALSE" = "Between family")) 
-print(H1)
+H1<- H + scale_x_discrete(labels=c("TRUE" = "Within family", "FALSE" = "Between family")) + theme_bw()
+print(H1) 
+
+H <- ggplot(j, aes(x = Within, y = BetaComparison)) +   
+geom_boxplot(outlier.shape = NA) + geom_jitter(width=0.05) +geom_signif(comparisons = list(c("FALSE", "TRUE")), map_signif_level = FALSE) + theme(text = element_text(size = 10)) + labs(x = "Members", y= "Dissimilarity index")
+H1<- H + scale_x_discrete(labels=c("TRUE" = "Within family", "FALSE" = "Between family")) + theme_bw(base_size = 20)
+print(H1) 
 ```
 
