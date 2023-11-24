@@ -8,7 +8,7 @@ The project emphasize on analysis of skin microbiota in genetically related indi
 - [Beta diversity analysis](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
 - [dbRDA](RDA.md)
 - core
-- [x] [Inter-generational analysis](Intergeneration_analysis.md): Core microbiome analysis is perfomred on skin microbiota.
+- [Inter-generational analysis](Intergeneration_analysis.md): within and between family member comparison across three generations.
 - [Tables](tables.md): 
    1. Table1- Family data
    2. Table 2- PERMANOVA
