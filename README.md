@@ -4,11 +4,11 @@
 ### Family data analysis
 
 - [TSE](fam_tse.Rmd): Create TSE object using metadata, otu table and taxa table
-- [Alpha diversity analysis/ Figure 1](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors.
-- [Beta diversity analysis](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
-- [dbRDA](RDA.md)
+- [Figure 2/ Alpha diversity analysis](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors.
+- [Figure 3 /Beta diversity analysis](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
+- [Figure 4/ dbRDA](RDA.md)
 - core
-- [Inter-generational analysis](Intergeneration_analysis.md): within and between family member comparison across three generations.
+- [Figure 6/ Inter-generational analysis](Intergeneration_analysis.md): within and between family member comparison across three generations.
 - [Tables](tables.md): 
    1. Table1- Family data
    2. Table 2- PERMANOVA
@@ -16,4 +16,4 @@
    4. Table 4-  Most prevalent Phyla (detection threshold=0.1%, prevalence>1%).
 
 #### supplimentory figure
-[supplimentory](supplimentory.md): Family-wise intergenerational analysis.
+[supplimentory figure 1](supplimentory.md): Family-wise intergenerational analysis.
