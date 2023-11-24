@@ -27,11 +27,12 @@ sampledata <- as.data.frame(read_excel("inputdata/processed/tables_new/Metadata.
 row.names(sampledata) <- sampledata$Sample
 
 # Convert data into TreeSummarizedExperiment object
-fam_tse <- TreeSummarizedExperiment(assays = SimpleList(counts=counts),
+fam_tse1 <- TreeSummarizedExperiment(assays = SimpleList(counts=counts),
                                 colData = sampledata,
 				rowData = tax) 
 
 # Save the data object
-saveRDS(fam_tse, file="inputdata/processed/TSE/fam_tse.rds")
-save(fam_tse, file="inputdata/processed/TSE/fam_tse.rda")
+saveRDS(fam_tse1, file="inputdata/processed/TSE/fam_tse.rds")
+save(fam_tse1, file="inputdata/processed/TSE/fam_tse.rda")
 ```
+

@@ -1,0 +1,162 @@
+---
+title: "Tables"
+author: "Renuka"
+date: "2023-05-09"
+output: html_document
+---
+
+##Table 1 
+
+```{r table1, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
+library(pacman)
+p_load(flextable, dplyr, officer)
+library(data.table)
+
+df <- tibble::tribble(
+  ~Family, ~t,	~Members,	~c, ~G1,	~G2, ~G3, ~b, ~Vegetarian,	~Mixed, ~bl, ~Male,  ~Female, ~bla,	~Pune, ~Ahmednagar, ~blan, ~Adult, ~Middleage, ~Elderly,
+"A",  NA, 5,  NA, 1, 2,  2, NA, 5, 0,  NA,  2, 3,   NA,   0, 5,   NA,  1, 2, 2, 
+"B",  NA, 3, NA,  1, 1, 1,  NA, 3, 0, NA,  2,  1,   NA,   0, 3,  NA,   1, 1, 1,
+"C", NA,  5, NA,  2, 2, 1, NA, 5, 0, NA,   3,  2,  NA,    5, 0,    NA,  2, 2, 1,
+"D", NA, 3, NA,  1, 1, 1, NA, 3, 0, NA,   0,  3,  NA,    0, 3,    NA,  1, 1, 1,
+"E",  NA, 4,  NA, 1, 2,  1, NA, 0, 4,  NA,  2, 2,   NA,   0, 4,   NA,  2, 1, 1, 
+"F",  NA, 5,  NA, 1, 2,  2, NA, 1, 4,  NA,  2, 3,   NA,   5, 0,   NA,  1, 2, 2,
+"G", NA,  5, NA,  2, 2, 1, NA, 5, 0, NA,   3,  2,  NA,    5, 0,    NA,  2, 2, 1,
+"H", NA,  5, NA,  2, 2, 1, NA, 5, 0, NA,   2,  3,  NA,    5, 0,    NA,  2, 2, 1,
+"I", NA,  6, NA,  2, 2, 2, NA, 6, 0, NA,   3,  3,  NA,    6, 0,    NA,  2, 2, 2,
+"J", NA,  5, NA,  2, 2, 1, NA, 0, 5, NA,   2,  3,  NA,    5, 0,    NA,  2, 2, 1,
+"K", NA,  5, NA,  1, 2, 2, NA, 5, 0, NA,   3,  2,  NA,    0, 5,    NA,  2, 1, 2,
+"L",  NA, 4,  NA, 1, 2,  1, NA, 4, 0,  NA,  2, 2,   NA,   4, 0,   NA,  1, 2, 1,
+"M",  NA, 5,  NA, 1, 2,  2, NA, 5, 0,  NA,  2, 3,   NA,   5, 0,   NA,  1, 2, 2,
+"N",  NA, 5,  NA, 1, 2,  2, NA, 3, 2,  NA,  1, 4,   NA,   5, 0,   NA,  1, 2, 2,
+"0",  NA, 7,  NA, 4, 2,  1, NA, 7, 0,  NA,  4, 3,   NA,   7, 0,   NA,  4, 2, 1
+ )
+ft <- flextable(df)
+ft <- delete_part(x = ft, part = "header")
+
+ft <- add_header_row(
+   ft, 
+   values = c(
+     "(n=15)", "",	"(n=72)",	 "", "(n=32)",	"(n=28)", "(n=21)", "", "(n=57)",	"(n=15)", "", "(n=33)",  "(n=39)", "",	"(n=52)", "(n=20)", "", "(n=25)", "(n=26)", "(n=21)"), 
+   top = TRUE 
+ )
+
+ft <- add_header_row(
+   ft, 
+   values = c(
+     "",	"",	"", "", "G1",	"G2", "G3", "", "Vegetarian",	"Mixed", "", "Male",  "Female", "",	"Pune", "Ahmednagar", "", "Adult", "Middle age", "Elderly"), 
+   top = TRUE 
+ )
+
+# Add the second row of the multilevel header
+ft <- add_header_row(ft, values = c("Family", "", "Members", "", "Generation", "", "Diet", "", "Gender", "", "Location", "", "Age"),
+                       colwidths = c(1, 1, 1, 1, 3, 1, 2, 1, 2, 1, 2, 1, 3), top = TRUE)
+
+ft <- theme_booktabs(ft, bold_header = TRUE)
+ft <- align(ft, part = "all", i = NULL, j = NULL, align = "center")
+
+# Add custom borders under multi-level headers
+
+# First define define the style of the border line
+border_style = officer::fp_border(color="black", width= 1)
+ft <- hline(ft, part="header", i = 2, j = c(5:7, 9:10, 12:13, 15:16, 18:20), border = border_style)
+ft <- hline(ft, part="header", i = 1, j = c(1, 3, 5:7, 9:10, 12:13, 15:16, 18:20), border = border_style)
+ft
+```
+
+##Table 2
+
+```{r tab, echo=FALSE, error=FALSE, message=FALSE}
+library(pacman)
+p_load(flextable, dplyr, officer)
+library(data.table)
+
+df <- tibble::tribble(
+  ~Factors,  	~R2,       	~p,
+  "Diet",    	0.00,     	0.93,   
+  "Age", 	    0.02,     	0.36,  
+  "Sex",  	0.00,	      0.61,
+  "Location",	0.19,     	0.07,
+  "Family", 	0.29,     	0.00
+ )
+
+# Set universal border color as black; otherwise it will will be dark grey.
+set_flextable_defaults(border.color = "black")
+
+# Create a flextable based on the dataset above
+ft <- flextable(df)
+
+ftt <- set_header_labels(ft, values = c( Factors = "Factor",
+     R2 = "R2",
+     p = "p-value"))
+ft_1 <- theme_booktabs(ftt, bold_header = TRUE)
+#ft_1 <- align(ft_1, i = 1, j = NULL, align = "center", part = "all")
+ft5 <- add_footer_lines(ft_1, "Note- The p-value indicates level of significance <0.001∗∗∗, <0.01∗∗, <0.05∗, 0.1 ns")
+ft6 <- set_table_properties(ft5, width = 0.5, layout = "autofit")
+ft6 <- align(ft6, part = "all", i = NULL, j = NULL, align = "center")
+ft7 <- fontsize(ft6, i = NULL, j = NULL, size = 11, part = "footer")
+ft7
+```
+
+##Table 3 
+
+```{r ta, echo=FALSE, error=FALSE, message=FALSE}
+library(pacman)
+p_load(flextable, dplyr, officer)
+library(data.table)
+
+df <- tibble::tribble(
+  ~Phylum,       ~Mean,    ~Median ,   ~Prevalence,
+  "Firmicutes",     73.0,      93.5,           100,  
+  "Proteobacteria", 23.8,       2.6,         58.3, 
+  "Actinobacteria", 3.2,       1.2,         59.7
+ )
+# Set universal border color as black; otherwise it will will be dark grey.
+set_flextable_defaults(border.color = "black")
+
+# Create a flextable based on the dataset above
+ft <- flextable(df)
+
+ftt <- set_header_labels(ft, values = c( Phylum = "Phylum",
+     Mean = "Mean relative abundance (%)",
+     Median = "Median (%)",
+     Prevalence = "Prevalence (%)"))
+ft_1 <- theme_booktabs(ftt, bold_header = TRUE)
+ft_1 <- align(ft_1, i = NULL, j = NULL, align = "center", part = "all")
+ft_2 <- italic(ft_1, i = NULL, j = "Phylum", italic = TRUE, part = "body")
+#ft_3 <- align(ft_2, i = 1, j = NULL, align = "right", part = "all")
+ft_4 <- align(ft_2, i = NULL, j = NULL, align = "center", part = "all")
+ft_4
+```
+
+##Table 4
+
+```{r table4, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
+library(pacman)
+p_load(flextable, dplyr, officer)
+library(data.table)
+
+da <- tibble::tribble(
+  ~Genus,       ~Mean,    ~Median ,   ~Prevalence,
+  "Staphylococcus",     50.9,   	60.2,	      100,       
+  "Bacillus",     	16.3,     	0.3,        	87.5,  
+  "Pseudomonas",   	9.2,     	0.1,          	61.1,
+  "Anaerococcus", 	1.7,   	0.0,          	38.9,
+  "Corynebacterium", 	1.0,	0.2,	          73.6,
+  "Dermabacter",     	0.4,   	0.0,     	40.2
+ )
+# Set universal border color as black; otherwise it will will be dark grey.
+set_flextable_defaults(border.color = "black")
+
+# Create a flextable based on the dataset above
+ta <- flextable(da)
+
+taa <- set_header_labels(ta, values = c( Genus = "Genus",
+     Mean = "Mean relative abundance (%)", 
+     Median = "Median (%)",
+     Prevalence = "Prevalence (%)"))
+
+ft_1 <- theme_booktabs(taa, bold_header = TRUE)
+ft_1 <- align(ft_1, i = NULL, j = NULL, align = "center", part = "all")
+ft_2 <- italic(ft_1, i = NULL, j = "Genus", italic = TRUE, part = "body")
+ft_2
+```

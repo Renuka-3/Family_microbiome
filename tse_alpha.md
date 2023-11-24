@@ -1,1 +1,4 @@
-<img src="tse_alpha_files/figure-markdown_strict/tsealpha-1.png" width="50%" /><img src="tse_alpha_files/figure-markdown_strict/tsealpha-2.png" width="50%" /><img src="tse_alpha_files/figure-markdown_strict/tsealpha-3.png" width="50%" /><img src="tse_alpha_files/figure-markdown_strict/tsealpha-4.png" width="50%" />
+    ##       Diet   Location        Sex        Age 
+    ## 0.08853315 0.08853315 0.73032083 0.73032083
+
+![](tse_alpha_files/figure-markdown_strict/alpha-1.png)

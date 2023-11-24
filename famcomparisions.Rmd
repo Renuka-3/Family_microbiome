@@ -1,0 +1,706 @@
+---
+title: "famcomparisions"
+author: "Renuka"
+date: "2023-05-08"
+output: html_document
+---
+
+## G2-G2 male and female with BC without location
+
+
+```{r g2g2, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(ggsignif)
+
+fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+tse <- transformCounts(fam_tse, method = "relabundance")
+tse <- runMDS(tse, FUN = vegan::vegdist, method = "bray", name = "bray", exprs_values = "relabundance")
+do <- assay(tse, "relabundance")
+di <- as.matrix(vegdist(t(do), method="bray"))
+# subsetting and filtering data
+subset_tse <- tse[ , tse$G %in% "G2"]
+subset_tse <- subset_tse[,!(colnames(subset_tse) %in% c("B2", "D2"))]
+##
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
+# subsetting and filtering data
+tse <- tse[ , tse$G %in% "G2"]
+tse <- tse[,!(colnames(tse) %in% c("B2", "D2"))]
+
+set.seed(123)
+within_pairs <- colData(tse) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+#inverted#between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=rev(within_pairs$pair_2))
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)%>% ggplot(aes(x=grp,y=value))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(width= 0.05, size= 1.7)+
+    geom_signif(comparisons = list(c("within_pairs", "between_pairs")), map_signif_level = TRUE) + theme(text = element_text(size = 5)) + labs(x = "", y= "Bray-Curtis index", title = "G2-G2 unrelated comparisions") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20)
+```
+
+G2 AND G1 each member- related comparision without location
+
+```{r g2g1, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(ggsignif)
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(magrittr)
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+dif <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+dif <- reshape2::melt(dif) %>% `colnames<-`(c("X","Y", "value"))
+
+# subsetting and filtering data for g2 single member
+tse1 <- tse[ , tse$G %in% "G2"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("B2", "D2"))]
+tse1 <- tse1[ , tse1$Gender %in% "Male"]
+
+# subsetting and filtering data for g1 single member
+tse2 <- tse[ , tse$G %in% "G1"]
+tse2 <- tse2[,!(colnames(tse2) %in% c("B1", "C2", "D1", "G2", "H2", "I2", "J2", "O2", "O3", "O4"))]
+#tse2 <- tse2[,!(colnames(tse2) %in% c("B1", "D1" ,"O3"))]
+#tse2 <- tse2[ , tse2$Gender %in% "Female"]
+
+##merging two tse
+tse3 <- mergeSEs(list(tse1, tse2), join = "inner")
+
+set.seed(123)
+within_pairs <- colData(tse3) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+#between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=rev(within_pairs$pair_2))
+rand <- sample(nrow(between_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+
+
+
+#between_pairs <- lapply(unique(colData(tse3)$Family), function(fam) {
+#    set.seed(123)
+#    pair_1 <- colData(tse3) %>% as_tibble() %>% 
+#    filter(Family==fam) %>% sample_n(1)
+ #   set.seed(123)
+#    pair_2 <- colData(tse3) %>% as_tibble() %>% 
+#    filter(Family!=fam) %>% sample_n(1)
+#    c(pair_1$Sample, pair_2$Sample)
+#}) %>% do.call(rbind, .) %>% 
+#    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2"))
+
+rbind(
+    merge(dif, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(dif, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)%>% ggplot(aes(x=grp,y=value))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(width= 0.05, size= 1.7)+
+    geom_signif(comparisons = list(c("within_pairs", "between_pairs")),map_signif_level = TRUE) + theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "G2-G1 related comparisions") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20)
+```
+
+
+G2 AND G3 each member- related comparision without location
+
+```{r g2g3, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(ggsignif)
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(magrittr)
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+dif <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+dif <- reshape2::melt(dif) %>% `colnames<-`(c("X","Y", "value"))
+
+# subsetting and filtering data for g2 single member
+tse4 <- tse[ , tse$G %in% "G2"]
+tse4 <- tse4[,!(colnames(tse4) %in% c("B2", "D2"))]
+tse4 <- tse4[ , tse4$Gender %in% "Male"]
+
+# subsetting and filtering data for g1 single member
+tse5 <- tse[ , tse$G %in% "G3"]
+tse5 <- tse5[,!(colnames(tse5) %in% c("A5", "B3", "D3", "F5", "I6", "K5", "M5", "N5"))]
+#tse2 <- tse2[,!(colnames(tse2) %in% c("B1", "D1" ,"O3"))]
+#tse2 <- tse2[ , tse2$Gender %in% "Female"]
+
+##merging two tse
+tse6 <- mergeSEs(list(tse4, tse5), join = "inner")
+
+set.seed(123)
+within_pairs <- colData(tse6) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+rand <- sample(nrow(between_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+
+rbind(
+    merge(dif, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(dif, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)%>% ggplot(aes(x=grp,y=value))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(width= 0.05, size= 1.7)+
+    geom_signif(comparisons = list(c("within_pairs", "between_pairs")),map_signif_level = TRUE) + theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "G2-G3 related comparisions") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20)
+```
+
+
+Location-wise G2 couple- unrlated comparisions
+
+```{r Lg2g2, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(ggsignif)
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(magrittr)
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
+
+tse_list <- splitOn(tse, f= "Location")
+tse_Ahmednagar <- tse_list[[1]]
+tse_Pune <- tse_list[[2]]
+
+# subsetting and filtering data
+tse_Ahmednagar <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G2"]
+tse_Ahmednagar <- tse_Ahmednagar[,!(colnames(tse_Ahmednagar) %in% c("B2", "D2"))]
+
+set.seed(123)
+within_pairs <- colData(tse_Ahmednagar) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+#between_pairs <- lapply(unique(colData(tse_Ahmednagar)$Family), function(fam) {
+#    set.seed(123)
+#    pair_1 <- colData(tse_Ahmednagar) %>% as_tibble() %>% 
+#    filter(Family==fam) %>% sample_n(1)
+#    set.seed(123)
+#    pair_2 <- colData(tse_Ahmednagar) %>% as_tibble() %>% 
+#    filter(Family!=fam & Gender!=pair_1$Gender) %>% sample_n(1)
+#    c(pair_1$Sample, pair_2$Sample)
+#}) %>% do.call(rbind, .) %>% 
+#    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2"))
+
+
+ANdf <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)
+
+#ggplot(aes(x=grp,y=value))+
+#    geom_boxplot(outlier.shape = NA)+
+#    geom_jitter(width= 0.05, size= 1.7)+
+#    geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "3 a) Ahmednagar") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20)
+
+
+tse_Pune <- tse_list[[2]]
+# subsetting and filtering data
+tse_Pune  <- tse_Pune [ , tse_Pune$G %in% "G2"]
+
+
+set.seed(123)
+within_pairs <- colData(tse_Pune) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+#between_pairs <- lapply(unique(colData(tse_Pune)$Family), function(fam) {
+#    set.seed(123)
+#    pair_1 <- colData(tse_Pune) %>% as_tibble() %>% 
+#    filter(Family==fam) %>% sample_n(1)
+#    set.seed(123)
+#    pair_2 <- colData(tse_Pune) %>% as_tibble() %>% 
+#    filter(Family!=fam & Gender!=pair_1$Gender) %>% sample_n(1)
+#    c(pair_1$Sample, pair_2$Sample)
+#}) %>% do.call(rbind, .) %>% 
+#    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2"))
+
+
+PNdf <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)
+
+mergedcities <- rbind(ANdf, PNdf)
+mergedcities$City <- c(rep("Ahmednagar", nrow(ANdf)),  rep("Pune", nrow(PNdf)))
+g <- ggplot(mergedcities, aes(x=grp,y=value))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
+    geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "Locationwise G2-G2 comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20)
+print(g)
+```
+
+
+
+Location-wise G1-G2 related comparisons
+
+```{r Lg2g1, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(ggsignif)
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(magrittr)
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
+
+tse_list <- splitOn(tse3, f= "Location")
+tse_Ahmdg2g1 <- tse_list[[1]]
+tse_Puneg2g1 <- tse_list[[2]]
+
+# subsetting and filtering data
+#tse_Ahmednagar <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G2"]
+#tse_Ahmednagar <- tse_Ahmednagar[,!(colnames(tse_Ahmednagar) %in% c("B2", "D2"))]
+
+set.seed(123)
+within_pairs <- colData(tse_Ahmdg2g1) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+between_pairs <- lapply(unique(colData(tse_Ahmdg2g1)$Family), function(fam) {
+    set.seed(123)
+    pair_1 <- colData(tse_Ahmdg2g1) %>% as_tibble() %>% 
+    filter(Family==fam) %>% sample_n(1)
+    set.seed(123)
+    pair_2 <- colData(tse_Ahmdg2g1) %>% as_tibble() %>% 
+    filter(Family!=fam & Gender!=pair_1$Gender) %>% sample_n(1)
+    c(pair_1$Sample, pair_2$Sample)
+}) %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2"))
+
+
+ANg2g1 <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)
+
+#ggplot(aes(x=grp,y=value))+
+#    geom_boxplot(outlier.shape = NA)+
+#    geom_jitter(width= 0.05, size= 1.7)+
+#    geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "3 a) Ahmednagar") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20)
+
+
+#tse_Pune <- tse_list[[2]]
+# subsetting and filtering data
+#tse_Pune  <- tse_Pune [ , tse_Pune$G %in% "G2"]
+tse_Puneg2g1 <- tse_list[[2]]
+
+set.seed(123)
+within_pairs <- colData(tse_Puneg2g1) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+between_pairs <- lapply(unique(colData(tse_Puneg2g1)$Family), function(fam) {
+    set.seed(123)
+    pair_1 <- colData(tse_Puneg2g1) %>% as_tibble() %>% 
+    filter(Family==fam) %>% sample_n(1)
+    set.seed(123)
+    pair_2 <- colData(tse_Puneg2g1) %>% as_tibble() %>% 
+    filter(Family!=fam & Gender!=pair_1$Gender) %>% sample_n(1)
+    c(pair_1$Sample, pair_2$Sample)
+}) %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2"))
+
+
+PNg2g1 <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)
+
+mergedcities <- rbind(ANg2g1, PNg2g1)
+mergedcities$City <- c(rep("Ahmednagar", nrow(ANg2g1)),  rep("Pune", nrow(PNg2g1)))
+s <- ggplot(mergedcities, aes(x=grp,y=value))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
+    geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "Location-wise G2-G1 related comparisions") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20)
+print(s)
+```
+
+tp
+Location-wise G2-G3 related comparisions
+
+```{r Lg2g3, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(ggsignif)
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(magrittr)
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
+
+tse_list <- splitOn(tse6, f= "Location")
+tse_Ahmdg2g3 <- tse_list[[1]]
+tse_Puneg2g3 <- tse_list[[2]]
+
+# subsetting and filtering data
+#tse_Ahmednagar <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G2"]
+#tse_Ahmednagar <- tse_Ahmednagar[,!(colnames(tse_Ahmednagar) %in% c("B2", "D2"))]
+
+set.seed(123)
+within_pairs <- colData(tse_Ahmdg2g3) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+between_pairs <- lapply(unique(colData(tse_Ahmdg2g3)$Family), function(fam) {
+    set.seed(123)
+    pair_1 <- colData(tse_Ahmdg2g3) %>% as_tibble() %>% 
+    filter(Family==fam) %>% sample_n(1)
+    set.seed(123)
+    pair_2 <- colData(tse_Ahmdg2g3) %>% as_tibble() %>% 
+    filter(Family!=fam & Gender!=pair_1$Gender) %>% sample_n(1)
+    c(pair_1$Sample, pair_2$Sample)
+}) %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2"))
+
+
+ANg2g3 <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)
+
+#ggplot(aes(x=grp,y=value))+
+#    geom_boxplot(outlier.shape = NA)+
+#    geom_jitter(width= 0.05, size= 1.7)+
+#    geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "3 a) Ahmednagar") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20)
+
+
+#tse_Pune <- tse_list[[2]]
+# subsetting and filtering data
+#tse_Pune  <- tse_Pune [ , tse_Pune$G %in% "G2"]
+tse_Puneg2g3 <- tse_list[[2]]
+
+set.seed(123)
+within_pairs <- colData(tse_Puneg2g3) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+between_pairs <- lapply(unique(colData(tse_Puneg2g3)$Family), function(fam) {
+    set.seed(123)
+    pair_1 <- colData(tse_Puneg2g3) %>% as_tibble() %>% 
+    filter(Family==fam) %>% sample_n(1)
+    set.seed(123)
+    pair_2 <- colData(tse_Puneg2g3) %>% as_tibble() %>% 
+    filter(Family!=fam & Gender!=pair_1$Gender) %>% sample_n(1)
+    c(pair_1$Sample, pair_2$Sample)
+}) %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2"))
+
+
+PNg2g3 <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)
+
+mergedcities <- rbind(ANg2g3, PNg2g3)
+mergedcities$City <- c(rep("Ahmednagar", nrow(ANg2g3)),  rep("Pune", nrow(PNg2g3)))
+s <- ggplot(mergedcities, aes(x=grp,y=value))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
+    geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "Location-wise G2-G3 related comparisions") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20)
+print(s)
+```
+
+
+
+Random 15 pairs- any 2 individuals without location
+
+```{r ran, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+tse <- transformCounts(fam_tse, method = "relabundance")
+tse <- runMDS(tse, FUN = vegan::vegdist, method = "bray", name = "bray", exprs_values = "relabundance")
+
+
+
+## two Members of same family
+d0 <- assay(tse, "relabundance")
+dx <- as.matrix(vegdist(t(d0), method="bray"))
+ran <- sample(1:5, 2)
+
+###########set.seed(1234)
+beta_compare <- function(families, dx) {
+  
+  
+  if (families[[1]] == families[[2]]) {
+    
+    endn <- sum(str_detect(rownames(dx), families[[1]]))
+    
+    my_rnd <- sample(1:endn, 2)
+    my_beta <- dx[paste0(families[[1]], my_rnd[[1]]), paste0(families[[2]], my_rnd[[2]])]
+
+    first_member <- paste0(families[[1]], my_rnd[[1]])
+    second_member <- paste0(families[[2]], my_rnd[[2]])
+    
+  } else {
+    
+    endn1 <- sum(str_detect(rownames(dx), families[[1]]))
+    endn2 <- sum(str_detect(rownames(dx), families[[2]]))
+    
+    my_rnd1 <- sample(1:endn1, 1)
+    my_rnd2 <- sample(1:endn2, 1)
+    
+    first_member <- paste0(families[[1]], my_rnd1[[1]])
+    second_member <- paste0(families[[2]], my_rnd2[[1]])
+    
+  }
+  
+  my_beta <- dx[first_member, second_member]
+  
+  return(list(my_beta,first_member, second_member))
+  
+}
+
+set.seed(2345)
+beta_values <- c()
+families1 <- c()
+families2 <- c()
+
+for (first_family in unique(tse$Family)){
+  
+  for (second_family in unique(tse$Family)){
+    
+    
+    tmp_res <- beta_compare(c(first_family, second_family ), dx)
+    beta_values <- c(beta_values, tmp_res[[1]])
+    families1 <- c(families1, tmp_res[[2]])
+    families2 <- c(families2, tmp_res[[3]])
+     
+  }
+}
+
+j <- data.frame(BetaComparison = beta_values,
+           FirstFamily = families1,
+           SecondFamily = families2)
+j <- j %>% mutate(Within = substr(FirstFamily, 1,1) == substr(SecondFamily, 1,1))
+L<- j %>% filter(Within==FALSE)
+set.seed(9876)
+y <- L[sample(1:nrow(L), 15), ] ##between comparisons 
+only_withins <- j %>% filter(Within==TRUE)
+newdf<- rbind(y, only_withins)
+library(ggsignif)
+H <- ggplot(newdf, aes(x = Within, y = BetaComparison)) +   
+geom_boxplot(outlier.shape = NA) + geom_jitter(width=0.05) +geom_signif(comparisons = list(c("FALSE", "TRUE")), map_signif_level = FALSE) + theme(text = element_text(size = 25)) + labs(x = "", y= "Bray-Curtis index", title = "Randomly selected two members")
+H1<- H + scale_x_discrete(labels=c("TRUE" = "Within family", "FALSE" = "Between family")) + theme_bw(20)
+print(H1) 
+```
+
+Random 15 pairs- any 2 individuals with location
+
+```{r ranL, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+tse <- transformCounts(fam_tse, method = "relabundance")
+tse <- runMDS(tse, FUN = vegan::vegdist, method = "bray", name = "bray", exprs_values = "relabundance")
+
+
+
+## two Members of same family
+d0 <- assay(tse, "relabundance")
+dx <- as.matrix(vegdist(t(d0), method="bray"))
+ran <- sample(1:5, 2)
+tse_list <- splitOn(tse, f= "Location")
+tse_Ahmednagar <- tse_list[[1]]
+tse_Pune <- tse_list[[2]]
+
+
+###########set.seed(1234)
+beta_compare <- function(families, dx) {
+  
+  
+  if (families[[1]] == families[[2]]) {
+    
+    endn <- sum(str_detect(rownames(dx), families[[1]]))
+    
+    my_rnd <- sample(1:endn, 2)
+    my_beta <- dx[paste0(families[[1]], my_rnd[[1]]), paste0(families[[2]], my_rnd[[2]])]
+
+    first_member <- paste0(families[[1]], my_rnd[[1]])
+    second_member <- paste0(families[[2]], my_rnd[[2]])
+    
+  } else {
+    
+    endn1 <- sum(str_detect(rownames(dx), families[[1]]))
+    endn2 <- sum(str_detect(rownames(dx), families[[2]]))
+    
+    my_rnd1 <- sample(1:endn1, 1)
+    my_rnd2 <- sample(1:endn2, 1)
+    
+    first_member <- paste0(families[[1]], my_rnd1[[1]])
+    second_member <- paste0(families[[2]], my_rnd2[[1]])
+    
+  }
+  
+  my_beta <- dx[first_member, second_member]
+  
+  return(list(my_beta,first_member, second_member))
+  
+}
+
+##############forAhmednagar#############
+set.seed(2345)
+beta_values <- c()
+families1 <- c()
+families2 <- c()
+
+for (first_family in unique(tse_Ahmednagar$Family)){
+  
+  for (second_family in unique(tse_Ahmednagar$Family)){
+    
+    
+    tmp_res <- beta_compare(c(first_family, second_family ), dx)
+    beta_values <- c(beta_values, tmp_res[[1]])
+    families1 <- c(families1, tmp_res[[2]])
+    families2 <- c(families2, tmp_res[[3]])
+     
+  }
+}
+
+j <- data.frame(BetaComparison = beta_values,
+           FirstFamily = families1,
+           SecondFamily = families2)
+j <- j %>% mutate(Within = substr(FirstFamily, 1,1) == substr(SecondFamily, 1,1))
+L<- j %>% filter(Within==FALSE)
+set.seed(9876)
+y <- L[sample(1:nrow(L), 5), ] ##between comparisons 
+only_withins <- j %>% filter(Within==TRUE)
+A_newdf<- rbind(y, only_withins)
+#library(ggsignif)
+#H <- ggplot(A_newdf, aes(x = Within, y = BetaComparison)) +   
+#geom_boxplot(outlier.shape = NA) + geom_jitter(width=0.05) +geom_signif(comparisons = list(c("FALSE", "TRUE")), map_signif_level = FALSE) + theme(text = element_text(size = 25)) + labs(x = "", y= "Bray-Curtis index", title = "Randomly selected two members")
+#H1<- H + scale_x_discrete(labels=c("TRUE" = "Within family", "FALSE" = "Between family")) + theme_bw(20)
+#print(H1) 
+
+##############forPune#############
+tse_Pune <- tse_list[[2]]
+beta_compare <- function(families, dx) {
+  
+  
+  if (families[[1]] == families[[2]]) {
+    
+    endn <- sum(str_detect(rownames(dx), families[[1]]))
+    
+    my_rnd <- sample(1:endn, 2)
+    my_beta <- dx[paste0(families[[1]], my_rnd[[1]]), paste0(families[[2]], my_rnd[[2]])]
+
+    first_member <- paste0(families[[1]], my_rnd[[1]])
+    second_member <- paste0(families[[2]], my_rnd[[2]])
+    
+  } else {
+    
+    endn1 <- sum(str_detect(rownames(dx), families[[1]]))
+    endn2 <- sum(str_detect(rownames(dx), families[[2]]))
+    
+    my_rnd1 <- sample(1:endn1, 1)
+    my_rnd2 <- sample(1:endn2, 1)
+    
+    first_member <- paste0(families[[1]], my_rnd1[[1]])
+    second_member <- paste0(families[[2]], my_rnd2[[1]])
+    
+  }
+  
+  my_beta <- dx[first_member, second_member]
+  
+  return(list(my_beta,first_member, second_member))
+  
+}
+
+
+set.seed(2345)
+beta_values <- c()
+families1 <- c()
+families2 <- c()
+
+for (first_family in unique(tse_Pune$Family)){
+  
+  for (second_family in unique(tse_Pune$Family)){
+    
+    
+    tmp_res <- beta_compare(c(first_family, second_family ), dx)
+    beta_values <- c(beta_values, tmp_res[[1]])
+    families1 <- c(families1, tmp_res[[2]])
+    families2 <- c(families2, tmp_res[[3]])
+     
+  }
+}
+
+j <- data.frame(BetaComparison = beta_values,
+           FirstFamily = families1,
+           SecondFamily = families2)
+j <- j %>% mutate(Within = substr(FirstFamily, 1,1) == substr(SecondFamily, 1,1))
+L<- j %>% filter(Within==FALSE)
+set.seed(9876)
+y <- L[sample(1:nrow(L), 10), ] ##between comparisons 
+only_withins <- j %>% filter(Within==TRUE)
+P_newdf<- rbind(y, only_withins)
+#library(ggsignif)
+#H <- ggplot(P_newdf, aes(x = Within, y = BetaComparison)) +   
+#geom_boxplot(outlier.shape = NA) + geom_jitter(width=0.05) +geom_signif(comparisons = list(c("FALSE", "TRUE")), map_signif_level = FALSE) + theme(text = element_text(size = 25)) + labs(x = "", y= "Bray-Curtis index", title = "Randomly selected two members")
+#H1<- H + scale_x_discrete(labels=c("TRUE" = "Within family", "FALSE" = "Between family")) + theme_bw(20)
+#print(H1) 
+
+mergedcities <- rbind(A_newdf, P_newdf)
+mergedcities$City <- c(rep("Ahmednagar", nrow(A_newdf)),  rep("Pune", nrow(P_newdf)))
+C <- ggplot(mergedcities, aes(x = Within, y = BetaComparison)) +   
+geom_boxplot(outlier.shape = NA) + geom_jitter(aes(colour = City),width=0.05) +geom_signif(comparisons = list(c("FALSE", "TRUE")), map_signif_level = FALSE) + theme(text = element_text(size = 25)) + labs(x = "", y= "Bray-Curtis index", title = "Randomly selected with city")
+C1<- C + scale_x_discrete(labels=c("TRUE" = "Within family", "FALSE" = "Between family")) + theme_bw(20)
+print(C1) 
+gridExtra::grid.arrange(H1, C1, nrow = 1)
+```

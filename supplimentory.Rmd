@@ -1,0 +1,270 @@
+---
+title: "supplimentory"
+author: "Renuka"
+date: "2023-09-25"
+output: html_document
+---
+
+
+
+```{r g1g3, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library("mia")
+fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+#Alpha diversity measures
+tse <- mia::estimateDiversity(fam_tse, 
+                              assay_name = "counts",
+                              index = "shannon", 
+                              name = "shannon")
+#head(colData(tse)$shannon)
+library(ggplot2)
+library(patchwork)
+library(ggsignif)
+tse1 <- tse[ , tse$G %in% "G2"]
+tse2 <- tse1[ ,!(colnames(tse1) %in% c("B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "H3", "H4", "I3", "I4", "J3", "J4", "K2", "K3", "L2", "L3", "M2", "M3", "N2", "N3", "O5", "O6"))]
+
+tse3 <- tse[ , tse$G %in% "G3"]
+tse4 <- tse3[,!(colnames(tse3) %in% c("B3", "C5", "D3", "E4", "F4", "F5", "G4", "H5", "I5", "I6", "J5", "K4", "K5", "L4", "M4", "M5", "N4", "N5", "O7"))]
+
+tse5 <- mergeSEs(list(tse2, tse4), join = "inner")
+df <- as.data.frame(colData(tse5))
+A <- ggplot(df, aes(x = G, y = shannon)) +  
+  geom_point(size=3)+ 
+  #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "A") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(A)
+
+##Family F
+tse1 <- tse[ , tse$G %in% "G2"]
+tse2 <- tse1[ ,!(colnames(tse1) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "G3", "G5", "H3", "H4", "I3", "I4", "J3", "J4", "K2", "K3", "L2", "L3", "M2", "M3", "N2", "N3", "O5", "O6"))]
+
+tse3 <- tse[ , tse$G %in% "G3"]
+tse4 <- tse3[,!(colnames(tse3) %in% c("A4", "A5","B3", "C5", "D3", "E4", "G4", "H5", "I5", "I6", "J5", "K4", "K5", "L4", "M4", "M5", "N4", "N5", "O7"))]
+
+tse5 <- mergeSEs(list(tse2, tse4), join = "inner")
+df <- as.data.frame(colData(tse5))
+F1 <- ggplot(df, aes(x = G, y = shannon)) + 
+  geom_point(size=3) +
+#geom_boxplot(outlier.shape = NA) + 
+ #geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "F") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(F1)
+
+##Family K
+tse1 <- tse[ , tse$G %in% "G2"]
+tse2 <- tse1[ ,!(colnames(tse1) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "H3", "H4", "I3", "I4", "J3", "J4", "L2", "L3", "M2", "M3", "N2", "N3", "O5", "O6"))]
+
+tse3 <- tse[ , tse$G %in% "G3"]
+tse4 <- tse3[,!(colnames(tse3) %in% c("A4", "A5","B3", "C5", "D3", "E4", "F4", "F5", "G4", "H5", "I5", "I6", "J5", "L4", "M4", "M5", "N4", "N5", "O7"))]
+
+tse5 <- mergeSEs(list(tse2, tse4), join = "inner")
+df <- as.data.frame(colData(tse5))
+K <- ggplot(df, aes(x = G, y = shannon)) +  geom_point(size=3) +
+#geom_boxplot(outlier.shape = NA) + 
+# geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "K") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(K)
+
+##Family M
+tse1 <- tse[ , tse$G %in% "G2"]
+tse2 <- tse1[ ,!(colnames(tse1) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "H3", "H4", "I3", "I4", "J3", "J4", "K2", "K3", "L2", "L3", "N2", "N3", "O5", "O6"))]
+
+tse3 <- tse[ , tse$G %in% "G3"]
+tse4 <- tse3[,!(colnames(tse3) %in% c("A4", "A5","B3", "C5", "D3", "E4", "F4", "F5", "G4", "H5", "I5", "I6", "J5", "K4", "K5", "L4", "N4", "N5", "O7"))]
+
+tse5 <- mergeSEs(list(tse2, tse4), join = "inner")
+df <- as.data.frame(colData(tse5))
+M <- ggplot(df, aes(x = G, y = shannon)) +  
+geom_point(size=3) +
+  #geom_boxplot(outlier.shape = NA) + 
+ #geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "M") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(M)
+
+##Family N
+tse1 <- tse[ , tse$G %in% "G2"]
+tse2 <- tse1[ ,!(colnames(tse1) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "H3", "H4", "I3", "I4", "J3", "J4", "K2", "K3", "L2", "L3", "M2", "M3", "O5", "O6"))]
+
+tse3 <- tse[ , tse$G %in% "G3"]
+tse4 <- tse3[,!(colnames(tse3) %in% c("A4", "A5","B3", "C5", "D3", "E4", "F4", "F5", "G4", "H5", "I5", "I6", "J5", "K4", "K5", "L4", "M4", "M5", "O7"))]
+
+tse5 <- mergeSEs(list(tse2, tse4), join = "inner")
+df <- as.data.frame(colData(tse5))
+N <- ggplot(df, aes(x = G, y = shannon)) +  
+  geom_point(size=3) +
+#geom_boxplot(outlier.shape = NA) + 
+ #geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "N") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(N)
+
+##Family I
+tse1 <- tse[ , tse$G %in% "G2"]
+tse2 <- tse1[ ,!(colnames(tse1) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "H3", "H4", "J3", "J4", "K2", "K3", "L2", "L3", "N2", "N3", "M2", "M3", "O5", "O6"))]
+
+tse3 <- tse[ , tse$G %in% "G3"]
+tse4 <- tse3[,!(colnames(tse3) %in% c("A4", "A5","B3", "C5", "D3", "E4", "F4", "F5", "G4", "H5", "J5", "K4", "K5", "L4", "M4", "M5", "N4", "N5", "O7"))]
+
+tse5 <- mergeSEs(list(tse2, tse4), join = "inner")
+df <- as.data.frame(colData(tse5))
+I <- ggplot(df, aes(x = G, y = shannon)) +  
+geom_point(size=3) +
+  #geom_boxplot(outlier.shape = NA) + 
+ #geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "I") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(I)
+library(gridExtra)
+gridExtra::grid.arrange(A, F1, I, K, M, N, nrow = 2)
+```
+
+
+
+```{r g1g2, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library("mia")
+fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+#Alpha diversity measures
+tse <- mia::estimateDiversity(fam_tse, 
+                              assay_name = "counts",
+                              index = "shannon", 
+                              name = "shannon")
+#head(colData(tse)$shannon)
+library(ggplot2)
+library(patchwork)
+library(ggsignif)
+
+
+###Family C
+
+tse1 <- tse[ , tse$G %in% "G1"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("A1", "B1", "D1", "E1", "F1", "G1", "G2", "H1", "H2", "I1", "I2", "J1", "J2", "K1", "L1", "M1", "N1", "O1", "O2", "O3", "O4"))]
+
+tse2 <- tse[ , tse$G %in% "G2"]
+tse3 <- tse2[ ,!(colnames(tse2) %in% c("A2", "A3", "B2", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "H3", "H4", "I3", "I4", "J3", "J4", "K2", "K3", "L2", "L3", "M2", "M3", "N2", "N3", "O5", "O6"))]
+
+tse4 <- mergeSEs(list(tse1, tse3), join = "inner")
+df <- as.data.frame(colData(tse4))
+c <- ggplot(df, aes(x = G, y = shannon)) +  
+  geom_point(size=3) +
+#geom_boxplot(outlier.shape = NA) + 
+# geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "C") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(c)
+
+
+###Family G
+
+tse1 <- tse[ , tse$G %in% "G1"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("A1", "B1", "C1", "C2", "D1", "E1", "F1", "H1", "H2", "I1", "I2", "J1", "J2", "K1", "L1", "M1", "N1", "O1", "O2", "O3", "O4"))]
+
+tse2 <- tse[ , tse$G %in% "G2"]
+tse3 <- tse2[ ,!(colnames(tse2) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "H3", "H4", "I3", "I4", "J3", "J4", "K2", "K3", "L2", "L3", "M2", "M3", "N2", "N3", "O5", "O6"))]
+
+tse4 <- mergeSEs(list(tse1, tse3), join = "inner")
+df <- as.data.frame(colData(tse4))
+g <- ggplot(df, aes(x = G, y = shannon)) +  
+  geom_point(size=3) +
+#geom_boxplot(outlier.shape = NA) + 
+# geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "G") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(g)
+
+
+###Family H
+
+tse1 <- tse[ , tse$G %in% "G1"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("A1", "B1", "C1", "C2", "D1", "E1", "F1", "G1", "G2", "I1", "I2", "J1", "J2", "K1", "L1", "M1", "N1", "O1", "O2", "O3", "O4"))]
+
+tse2 <- tse[ , tse$G %in% "G2"]
+tse3 <- tse2[ ,!(colnames(tse2) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "I3", "I4", "J3", "J4", "K2", "K3", "L2", "L3", "M2", "M3", "N2", "N3", "O5", "O6"))]
+
+tse4 <- mergeSEs(list(tse1, tse3), join = "inner")
+df <- as.data.frame(colData(tse4))
+h <- ggplot(df, aes(x = G, y = shannon)) +
+  geom_point(size=3) + 
+#geom_boxplot(outlier.shape = NA) + 
+# geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "H") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(h)
+
+
+###Family I
+
+tse1 <- tse[ , tse$G %in% "G1"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("A1", "B1", "C1", "C2", "D1", "E1", "F1", "G1", "G2", "H1", "H2", "J1", "J2", "K1", "L1", "M1", "N1", "O1", "O2", "O3", "O4"))]
+
+tse2 <- tse[ , tse$G %in% "G2"]
+tse3 <- tse2[ ,!(colnames(tse2) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "H3", "H4", "J3", "J4", "K2", "K3", "L2", "L3", "M2", "M3", "N2", "N3", "O5", "O6"))]
+
+tse4 <- mergeSEs(list(tse1, tse3), join = "inner")
+df <- as.data.frame(colData(tse4))
+i <- ggplot(df, aes(x = G, y = shannon)) +  
+geom_point(size=3) + 
+  #geom_boxplot(outlier.shape = NA) + 
+ #geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "I") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(i)
+
+###Family J
+
+tse1 <- tse[ , tse$G %in% "G1"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("A1", "B1", "C1", "C2", "D1", "E1", "F1", "G1", "G2", "H1", "H2", "I1", "I2", "K1", "L1", "M1", "N1", "O1", "O2", "O3", "O4"))]
+
+tse2 <- tse[ , tse$G %in% "G2"]
+tse3 <- tse2[ ,!(colnames(tse2) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "H3", "H4", "I3", "I4", "K2", "K3", "L2", "L3", "M2", "M3", "N2", "N3", "O5", "O6"))]
+
+tse4 <- mergeSEs(list(tse1, tse3), join = "inner")
+df <- as.data.frame(colData(tse4))
+j <- ggplot(df, aes(x = G, y = shannon)) +  
+geom_point(size=3) + 
+  #geom_boxplot(outlier.shape = NA) + 
+ #geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "J") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(j)
+
+
+###Family O1
+
+tse1 <- tse[ , tse$G %in% "G1"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("A1", "B1", "C1", "C2", "D1", "E1", "F1", "G1", "G2", "H1", "H2", "I1", "I2", "J1", "J2", "K1", "L1", "M1", "N1", "O3", "O4"))]
+
+tse2 <- tse[ , tse$G %in% "G2"]
+tse3 <- tse2[ ,!(colnames(tse2) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "H3", "H4", "I3", "I4", "J3", "J4", "K2", "K3", "L2", "L3", "M2", "M3", "N2", "N3"))]
+
+tse4 <- mergeSEs(list(tse1, tse3), join = "inner")
+df <- as.data.frame(colData(tse4))
+o1 <- ggplot(df, aes(x = G, y = shannon)) +  
+geom_point(size=3) +
+  #geom_boxplot(outlier.shape = NA) + 
+ #geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "O1") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(o1)
+
+###Family O2
+
+tse1 <- tse[ , tse$G %in% "G1"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("A1", "B1", "C1", "C2", "D1", "E1", "F1", "G1", "G2", "H1", "H2", "I1", "I2", "J1", "J2", "K1", "L1", "M1", "N1", "O1", "O2"))]
+
+tse2 <- tse[ , tse$G %in% "G2"]
+tse3 <- tse2[ ,!(colnames(tse2) %in% c("A2", "A3", "B2", "C3", "C4", "D2", "E2", "E3", "F2", "F3", "G3", "G5", "H3", "H4", "I3", "I4", "J3", "J4", "K2", "K3", "L2", "L3", "M2", "M3", "N2", "N3"))]
+
+tse4 <- mergeSEs(list(tse1, tse3), join = "inner")
+df <- as.data.frame(colData(tse4))
+o2 <- ggplot(df, aes(x = G, y = shannon)) +  
+  geom_point(size=3) +
+#geom_boxplot(outlier.shape = NA) + 
+# geom_jitter(width = 0.05) + 
+  #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
+  labs(y = "Shannon index", x = "", title = "O2") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
+print(o2)
+library(gridExtra)
+gridExtra::grid.arrange(c, g, h, i, j, o1, o2, nrow = 2)
+```

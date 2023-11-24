@@ -1,0 +1,519 @@
+---
+title: "G1,G2,G3"
+author: "Renuka"
+date: "2023-09-18"
+output: html_document
+---
+
+# G1-G2 (location, gender matched)
+
+```{r g1g2, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(ggsignif)
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(magrittr)
+
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
+
+# subsetting and filtering data for g1 members
+tse1 <- tse[ , tse$G %in% "G1"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("C2", "G2", "H2", "I2", "J2", "O2", "O3","O4"))]
+
+
+# subsetting and filtering data for g2 members
+tse2 <- tse[ , tse$G %in% "G2"]
+tse3 <- tse2[ , tse2$Sex %in% "Male"]
+tse4 <- tse2[ , tse2$Sex %in% "Female"]
+tse5 <- tse4[,!(colnames(tse4) %in% c("A3", "C4", "E3", "F3", "G3", "H4", "I4", "J4", "K3", "L3", "M3", "N3", "O6"))]
+tse6 <- mergeSEs(list(tse3, tse5), join = "inner") #merging g2 (gender matched)
+
+##merging final two tse of G1 (female) and G2 (male)
+tse7 <- mergeSEs(list(tse1, tse6), join = "inner")
+
+#spling location-wise
+tse_list <- splitOn(tse7, f= "Location")
+tse_Ahmdg1g2 <- tse_list[[1]]
+tse_Puneg1g2 <- tse_list[[2]]
+
+
+set.seed(123)
+within_pairs <- colData(tse_Ahmdg1g2) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+
+ANg1g2 <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)
+
+tse_Puneg1g2 <- tse_list[[2]]
+
+set.seed(123)
+within_pairs <- colData(tse_Puneg1g2) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+PNg1g2 <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp=rep("between_pairs",nrow(between_pairs)))
+)
+
+mergedcities <- rbind(ANg1g2, PNg1g2)
+mergedcities$City <- c(rep("Ahmednagar", nrow(ANg1g2)),  rep("Pune", nrow(PNg1g2)))
+a <- ggplot(mergedcities, aes(x=grp,y=value))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
+    #geom_signif(comparisons = list(c("within_pairs", "between_pairs")), map_signif_level = FALSE) 
+  theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "A. G1-G2 comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
+print(a)
+```
+
+# G2-G3 (location, gender matched)
+
+```{r g2g3, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(ggsignif)
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(magrittr)
+
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
+
+# subsetting and filtering data for g2 members
+tse1 <- tse[ , tse$G %in% "G2"]
+tse2 <- tse1[,!(colnames(tse1) %in% c("A2", "C3", "E3", "F2", "G5", "H4", "I3", "J4", "K2", "L2", "M3", "N3", "O5"))]
+
+# subsetting and filtering data for g3 members
+tse3 <- tse[ , tse$G %in% "G3"]
+tse4 <- tse3[,!(colnames(tse3) %in% c("A4", "F5", "I6", "K5", "M5", "N5"))]
+
+##merging final two tse
+tse5 <- mergeSEs(list(tse2, tse4), join = "inner")
+
+#spling location-wise
+tse_list <- splitOn(tse5, f= "Location")
+tse_Ahmdg2g3 <- tse_list[[1]]
+tse_Puneg2g3 <- tse_list[[2]]
+
+
+set.seed(123)
+within_pairs <- colData(tse_Ahmdg2g3) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+ANg2g3 <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp1=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp1=rep("between_pairs",nrow(between_pairs)))
+)
+
+tse_Puneg2g3 <- tse_list[[2]]
+
+set.seed(123)
+within_pairs <- colData(tse_Puneg2g3) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+
+PNg2g3 <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp1=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp1=rep("between_pairs",nrow(between_pairs)))
+)
+
+mergedcities1 <- rbind(ANg2g3, PNg2g3)
+mergedcities1$City <- c(rep("Ahmednagar", nrow(ANg2g3)),  rep("Pune", nrow(PNg2g3)))
+colnames(mergedcities1)[which(colnames(mergedcities1) %in% "value")] <- "value1"
+b <- ggplot(mergedcities1, aes(x=grp1,y=value1))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
+    #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + 
+  labs(x = "", y= "Bray-Curtis index", title = "B. G2-G3 comparision") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
+print(b)
+```
+
+
+# G1-G3 (location, gender matched)
+
+```{r g1g3, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(ggsignif)
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(magrittr)
+
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
+
+# subsetting and filtering data for g1  members (gender matched)
+tse1 <- tse[ , tse$G %in% "G1"]
+tse2 <- tse1[,!(colnames(tse1) %in% c("C2", "G2", "H1", "I1", "J1", "O2", "O3", "O4"))]
+
+
+# subsetting and filtering data for g3 members
+tse3 <- tse[ , tse$G %in% "G3"]
+tse4 <- tse3[,!(colnames(tse3) %in% c("A4", "F5", "I5", "K5", "M4", "N5"))]
+
+##merging final two tse
+tse5 <- mergeSEs(list(tse2, tse4), join = "inner")
+
+#spling location-wise
+tse_list <- splitOn(tse5, f= "Location")
+tse_Ahmdg1g3 <- tse_list[[1]]
+tse_Puneg1g3 <- tse_list[[2]]
+
+
+set.seed(123)
+within_pairs <- colData(tse_Ahmdg1g3) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+ANg1g3 <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp2=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp2=rep("between_pairs",nrow(between_pairs)))
+)
+
+tse_Puneg1g3 <- tse_list[[2]]
+
+set.seed(123)
+within_pairs <- colData(tse_Puneg1g3) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+PNg1g3 <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp2=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp2=rep("between_pairs",nrow(between_pairs)))
+)
+
+mergedcities2 <- rbind(ANg1g3, PNg1g3)
+mergedcities2$City <- c(rep("Ahmednagar", nrow(ANg1g3)),  rep("Pune", nrow(PNg1g3)))
+colnames(mergedcities2)[which(colnames(mergedcities2) %in% "value")] <- "value2"
+c <- ggplot(mergedcities2, aes(x=grp2,y=value2))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
+    #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + 
+  labs(x = "", y= "Bray-Curtis index", title = "C. G1-G3 comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
+print(c) 
+
+## Multiple pairwise comparison 
+#m <- c()
+#l <- cbind(mergedcities, mergedcities1, mergedcities2)
+#m[["grp"]] <- kruskal.test(data = l, value ~ factor(grp))$p.value
+#m[["grp1"]] <- kruskal.test(data = l, value1 ~ factor(grp1))$p.value
+#m[["grp2"]] <- kruskal.test(data = l, value2 ~ factor(grp2))$p.value
+#p.adjust(m, method="fdr")
+```
+
+# Father-child location-wise
+
+```{r FC, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(ggsignif)
+
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
+
+tse_list <- splitOn(tse, f= "Location")
+tse_Ahmednagar <- tse_list[[1]]
+tse_Pune <- tse_list[[2]]
+
+# subsetting and filtering data
+tse1 <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G2"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("B2", "D2"))]
+tse1FM <- tse1[ , tse1$Sex %in% "Female"]
+tse1ML <- tse1[ , tse1$Sex %in% "Male"]
+#tse2 <- tse[ , tse$G %in% "G3"]
+#tse2 <- tse2[,!(colnames(tse2) %in% c("A4", "B3", "D3", "F5", "I5", "K4", "M4", "N5"))]
+tse2 <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G3"]
+tse2AN <- tse2[,!(colnames(tse2) %in% c("A5", "B3", "D3", "K4"))]
+MC_AN_M <- mergeSEs(list(tse1ML, tse2AN), join = "inner") ##merging two tse of father and child from ahmednagar
+
+tse3 <- tse_Pune[ , tse_Pune$G %in% "G2"]
+tse3FM <- tse3[ , tse3$Sex %in% "Female"]
+tse3ML <- tse3[ , tse3$Sex %in% "Male"]
+tse3 <- tse_Pune[ , tse_Pune$G %in% "G3"]
+tse3P <- tse3[,!(colnames(tse3) %in% c("F4", "I5", "M4", "N5"))] 
+MC_P_M <- mergeSEs(list(tse3ML, tse3P), join = "inner") ##merging two tse of father and child from Pune
+
+set.seed(123)
+within_pairs <- colData(MC_AN_M) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+#inverted#between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=rev(within_pairs$pair_2))
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+MC_ANdf_M <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp3=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp3=rep("between_pairs",nrow(between_pairs)))
+)
+
+set.seed(123)
+within_pairs <- colData(MC_P_M) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+#inverted#between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=rev(within_pairs$pair_2))
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+MC_Pdf_M <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp3=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp3=rep("between_pairs",nrow(between_pairs)))
+)
+mergedcities3 <- rbind(MC_ANdf_M, MC_Pdf_M)
+mergedcities3$City <- c(rep("Ahmednagar", nrow(MC_ANdf_M)),  rep("Pune", nrow(MC_Pdf_M)))
+colnames(mergedcities3)[which(colnames(mergedcities3) %in% "value")] <- "value3"
+E <- ggplot(mergedcities3, aes(x=grp3,y=value3))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
+    #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + 
+  theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "D.Father-child comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
+print(E) 
+```
+
+
+# Mother-child (genetic relatedness) with location
+
+```{r MC, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(ggsignif)
+
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
+
+tse_list <- splitOn(tse, f= "Location")
+tse_Ahmednagar <- tse_list[[1]]
+tse_Pune <- tse_list[[2]]
+
+# subsetting and filtering data
+tse1 <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G2"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("B2", "D2"))]
+tse1FM <- tse1[ , tse1$Sex %in% "Female"]
+tse1ML <- tse1[ , tse1$Sex %in% "Male"]
+#tse2 <- tse[ , tse$G %in% "G3"]
+#tse2 <- tse2[,!(colnames(tse2) %in% c("A4", "B3", "D3", "F5", "I5", "K4", "M4", "N5"))]
+######tse_g3 <- tse2[,!(colnames(tse2) %in% c("A5", "B3", "D3", "F4", "I5", "K4", "M4", "N5"))]
+tse2 <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G3"]
+tse2AN <- tse2[,!(colnames(tse2) %in% c("A5", "B3", "D3", "K4"))]
+MC_AN <- mergeSEs(list(tse1FM, tse2AN), join = "inner") ##merging two tse of mother and child from ahmednagar
+
+tse3 <- tse_Pune[ , tse_Pune$G %in% "G2"]
+tse3FM <- tse3[ , tse3$Sex %in% "Female"]
+tse3ML <- tse3[ , tse3$Sex %in% "Male"]
+tse3 <- tse_Pune[ , tse_Pune$G %in% "G3"]
+tse3P <- tse3[,!(colnames(tse3) %in% c("F4", "I5", "M4", "N5"))]
+MC_P <- mergeSEs(list(tse3FM, tse3P), join = "inner") ##merging two tse of mother and child from Pune
+
+set.seed(123)
+within_pairs <- colData(MC_AN) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+#inverted#between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=rev(within_pairs$pair_2))
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+
+MC_ANdf <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp4=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp4=rep("between_pairs",nrow(between_pairs)))
+)
+
+set.seed(123)
+within_pairs <- colData(MC_P) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(within_pairs=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(within_pairs) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+#inverted#between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=rev(within_pairs$pair_2))
+rand <- sample(nrow(within_pairs))
+between_pairs <- data.frame(pair_1=within_pairs$pair_1, pair_2=within_pairs$pair_2[rand])
+MC_Pdf <- rbind(
+    merge(di, within_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp4=rep("within_pairs",nrow(within_pairs))),
+    merge(di, between_pairs, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp4=rep("between_pairs",nrow(between_pairs)))
+)
+mergedcities4 <- rbind(MC_ANdf, MC_Pdf)
+mergedcities4$City <- c(rep("Ahmednagar", nrow(MC_ANdf)),  rep("Pune", nrow(MC_Pdf)))
+colnames(mergedcities4)[which(colnames(mergedcities4) %in% "value")] <- "value4"
+L <- ggplot(mergedcities4, aes(x=grp4,y=value4))+
+    geom_boxplot(outlier.shape = NA)+
+    geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
+    #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + 
+  theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "E. Mother-child comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
+print(L)
+
+## Multiple pairwise comparison 
+#m <- c()
+#l <- cbind(mergedcities3, mergedcities4)
+#m[["grp3"]] <- kruskal.test(data = l, value3 ~ factor(grp3))$p.value
+#m[["grp4"]] <- kruskal.test(data = l, value4 ~ factor(grp4))$p.value
+#p.adjust(m, method="fdr")
+```
+
+
+# Mother-child and father-child comparisons within family 
+
+```{r g2g3MF, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(mia)
+library(vegan)
+library(scater)
+library(dplyr)
+library(tidyverse)
+library(ggsignif)
+
+tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
+di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
+
+tse_list <- splitOn(tse, f= "Location")
+tse_Ahmednagar <- tse_list[[1]]
+tse_Pune <- tse_list[[2]]
+
+# subsetting and filtering data for mother and child comparison
+tse1 <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G2"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("B2", "D2"))]
+tse1FM <- tse1[ , tse1$Sex %in% "Female"]
+#tse1ML <- tse1[ , tse1$Gender %in% "Male"]
+tse2 <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G3"]
+tse2AN <- tse2[,!(colnames(tse2) %in% c("A5", "B3", "D3", "K4"))]
+motherchild_ahmdnagar <- mergeSEs(list(tse1FM, tse2AN), join = "inner") ###merging mother and child tse by ahmednagar
+
+tse3 <- tse_Pune[ , tse_Pune$G %in% "G2"]
+tse3FM <- tse3[ , tse3$Sex %in% "Female"]
+#tse3ML <- tse3[ , tse3$Gender %in% "Male"]
+tse3 <- tse_Pune[ , tse_Pune$G %in% "G3"]
+tse3P <- tse3[,!(colnames(tse3) %in% c("F4", "I5", "M4", "N5"))]
+motherchild_pune <- mergeSEs(list(tse3FM, tse3P), join = "inner") ##merging mother and child tse by Pune
+
+##combining tse for mother and child from two cities
+motherchild_comb <- mergeSEs(list(motherchild_ahmdnagar, motherchild_pune), join = "inner") ##mearning ahmednagar and pune mother-child TSE 
+
+# subsetting and filtering data for father and child comparison
+tse1 <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G2"]
+tse1 <- tse1[,!(colnames(tse1) %in% c("B2", "D2"))]
+#tse1FM <- tse1[ , tse1$Gender %in% "Female"]
+tse1ML <- tse1[ , tse1$Sex %in% "Male"]
+tse2 <- tse_Ahmednagar[ , tse_Ahmednagar$G %in% "G3"]
+tse2AN <- tse2[,!(colnames(tse2) %in% c("A5", "B3", "D3", "K4"))]
+MC_AN_M <- mergeSEs(list(tse1ML, tse2AN), join = "inner") ##merging father and child tse by ahmednagar
+
+tse3 <- tse_Pune[ , tse_Pune$G %in% "G2"]
+tse3FM <- tse3[ , tse3$Sex %in% "Female"]
+tse3ML <- tse3[ , tse3$Sex %in% "Male"]
+tse3 <- tse_Pune[ , tse_Pune$G %in% "G3"]
+tse3P <- tse3[,!(colnames(tse3) %in% c("F4", "I5", "M4", "N5"))] 
+MC_P_M <- mergeSEs(list(tse3ML, tse3P), join = "inner") ##merging father and child tse by Pune
+
+##combining tse for father and child from two cities
+fatherchild_comb <- mergeSEs(list(MC_AN_M, MC_P_M), join = "inner")
+
+set.seed(123)
+motherchild <- colData(motherchild_comb) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(motherchild=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(motherchild) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+
+set.seed(123)
+fatherchild <- colData(fatherchild_comb) %>% as_tibble() %>% group_by(Family) %>%
+    summarise(fatherchild=combn(Sample, 2, simplify = FALSE)) %>% 
+    select(fatherchild) %>% .[[1]] %>% do.call(rbind, .) %>% 
+    as.data.frame() %>% `colnames<-`(c("pair_1", "pair_2")) 
+
+
+test <- rbind(
+    merge(di, motherchild, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp5=rep("motherchild",nrow(motherchild))),
+    merge(di, fatherchild, by.x=c("X","Y"), by.y=c("pair_1", "pair_2")) %>%
+        mutate(grp5=rep("fatherchild",nrow(fatherchild)))
+)
+
+test$City <- c("Ahmednagar","Pune", "Ahmednagar", "Pune", "Pune", "Pune", "Pune", "Pune","Ahmednagar", "Pune", "Pune", "Pune", "Pune", "Ahmednagar","Pune", "Ahmednagar", "Pune", "Pune", "Pune", "Pune", "Pune","Ahmednagar", "Pune", "Pune", "Pune", "Pune")
+colnames(test)[which(colnames(test) %in% "value")] <- "value5"
+tp <- ggplot(test,aes(x=grp5,y=value5))+
+    geom_boxplot(outlier.shape = NA) +
+    geom_jitter(width= 0.05, size= 1.7, aes(colour=City)) +
+  #geom_signif(comparisons = list(c("motherchild", "fatherchild")), map_signif_level = FALSE) + 
+  theme(text = element_text(size = 5)) + labs(x = "", y= "Bray-Curtis index", title = "F.Parent-child comparison within family") + scale_x_discrete(labels=c("motherchild" = "Mother-child", "fatherchild" = "Father-child")) + theme_bw(base_size = 20) + theme(legend.position = "none")
+print(tp)
+
+## Multiple pairwise comparison 
+l <- c()
+m <- mergedcities
+n <- mergedcities1
+o <- mergedcities2
+p <- mergedcities3
+q <- mergedcities4
+r <- test
+l[["grp"]] <- kruskal.test(data = m, value ~ factor(grp))$p.value
+l[["grp1"]] <- kruskal.test(data = n, value1 ~ factor(grp1))$p.value
+l[["grp2"]] <- kruskal.test(data = o, value2 ~ factor(grp2))$p.value
+l[["grp3"]] <- kruskal.test(data = p, value3 ~ factor(grp3))$p.value
+l[["grp4"]] <- kruskal.test(data = q, value4 ~ factor(grp4))$p.value
+l[["grp5"]] <- kruskal.test(data = r, value5 ~ factor(grp5))$p.value
+p.adjust(l, method="fdr")
+
+gridExtra::grid.arrange(a,b,c, E, L, tp, nrow = 2)
+```
