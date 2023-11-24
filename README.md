@@ -3,7 +3,7 @@ The project emphasize on analysis of skin microbiota in genetically related indi
 
 ### Family data analysis
 
-- [x] [Phyloseq](Phyloseq.Rmd): Create phyloseq object using metadata, otu table and taxa table
+- [x] [TSE](fam_tse.Rmd): Create TSE object using metadata, otu table and taxa table
 - [ ] [Alpha diversity analysis](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors.
 - [x] [Beta diversity analysis](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
 - [x] [dbRDA](RDA.md)
