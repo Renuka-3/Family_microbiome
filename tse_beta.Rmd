@@ -58,31 +58,6 @@ p <- p + labs(x = paste("PCoA 1 (", round(100 * rel_eig[[1]],1), "%", ")", sep =
    theme(legend.position = 'none', legend.text=element_text(size=9)) + theme(axis.text.x = element_text(size=8), axis.text.y = element_text(size = 8)) + theme(axis.title = element_text(size = 10), plot.title = element_text(size = 15))
 #print(p)
 
-# Create ggplot object for Diet
-p1 <- plotReducedDim(tse, "PCoA_BC", colour_by = "Diet", point_size= 2.5)
-e <- attr(reducedDim(tse, "PCoA_BC"), "eig");
-rel_eig <- e/sum(e[e>0])          
-p1 <- p1 + labs(x = paste("PCoA 1 (", round(100 * rel_eig[[1]],1), "%", ")", sep = ""),
-              y = paste("PCoA 2 (", round(100 * rel_eig[[2]],1), "%", ")", sep = ""), title= "C. Diet") + 
-   theme(legend.position = 'bottom', legend.text=element_text(size=9)) + theme(axis.text.x = element_text(size=8), axis.text.y = element_text(size = 8)) + theme(axis.title = element_text(size = 10), plot.title = element_text(size = 15))
-#print(p1)
-
-# Create ggplot object for Age
-p2 <- plotReducedDim(tse, "PCoA_BC", colour_by = "Age", point_size= 2.5)
-e <- attr(reducedDim(tse, "PCoA_BC"), "eig");
-rel_eig <- e/sum(e[e>0])          
-p2 <- p2 + labs(x = paste("PCoA 1 (", round(100 * rel_eig[[1]],1), "%", ")", sep = ""),
-              y = paste("PCoA 2 (", round(100 * rel_eig[[2]],1), "%", ")", sep = ""), title= "Age") + 
-   theme(legend.position = 'bottom', legend.text=element_text(size=6)) + theme(axis.text.x = element_text(size=8), axis.text.y = element_text(size = 8)) + theme(axis.title = element_text(size = 10), plot.title = element_text(size = 15))
-#print(p2)
-
-# Create ggplot object for Gender
-p3 <- plotReducedDim(tse, "PCoA_BC", colour_by = "Sex", point_size= 2.5, point_alpha= 0.5)
-e <- attr(reducedDim(tse, "PCoA_BC"), "eig");
-rel_eig <- e/sum(e[e>0])          
-p3 <- p3 + labs(x = paste("PCoA 1 (", round(100 * rel_eig[[1]],1), "%", ")", sep = ""),
-              y = paste("PCoA 2 (", round(100 * rel_eig[[2]],1), "%", ")", sep = ""), title= "Sex") + 
-   theme(legend.position = 'bottom', legend.text=element_text(size=9)) + theme(axis.text.x = element_text(size=8), axis.text.y = element_text(size = 8)) + theme(axis.title = element_text(size = 10), plot.title = element_text(size = 15))
 
 # Create ggplot object for Family
 p4 <- plotReducedDim(tse, "PCoA_BC", colour_by = "Family", point_size= 2.5)
@@ -94,16 +69,6 @@ p4 <- p4 + labs(x = paste("PCoA 1 (", round(100 * rel_eig[[1]],1), "%", ")", sep
 library(gridExtra)
 library(ggpubr)
 gridExtra::grid.arrange(p4, p, ncol = 2, widths=c(0.5, 0.5), heights = c(10, 4))
-#ggarrange(p4, p, p1, widths = c(1.5,2))
-grid.arrange(p4, arrangeGrob(p, p1), ncol = 2, widths=c(0.5, 0.3), heights = c(6, 4))
-#grid.arrange(p4, arrangeGrob(p, p1), ncol = 2, widths=c(1, 0.7), heights = c(7, 5))
-#grid.arrange(p4, arrangeGrob(p, p1), ncol = 2, widths=c(1.8, 1.2), heights = c(7, 5))
-#grid.arrange(p4, arrangeGrob(p, p1), ncol = 2)
-#grid.arrange(p4, arrangeGrob(p, p1), ncol = 2, widths=c(1.8, 1.5), heights = c(0.2, 2.5))
-gridExtra::grid.arrange(p4, p, nrow = 2)
-#library(gridExtra)
-#gridExtra::grid.arrange(p, p1, p2, p3, p4, nrow = 2)
-
 
 
 ## PERMANOVA analysis
@@ -131,26 +96,4 @@ permanova <- adonis2(t(assay(tse,"relabundance")) ~ Location + Diet + Age + Fami
                      method = "bray",
                      permutations = 999)
 head(permanova)
-```
-
-
-```{r, message= False}
-#library(scater)
-tse <- transformSamples(tse, method = "relabundance")
-tse <- runMDS(tse, FUN = vegan::vegdist, method = "bray", name = "PCoA_BC", exprs_values = "relabundance")
-
-subset_tse <- tse[ , tse$Family %in% "A"]
-
-# Create ggplot object for location 
-p <- plotReducedDim(subset_tse, "PCoA_BC", colour_by = "Sample", point_size= 2.5)
-# Add explained variance for each axis
-e <- attr(reducedDim(subset_tse, "PCoA_BC"), "eig");
-rel_eig <- e/sum(e[e>0])          
-p <- p + labs(x = paste("PCoA 1 (", round(100 * rel_eig[[1]],1), "%", ")", sep = ""),
-              y = paste("PCoA 2 (", round(100 * rel_eig[[2]],1), "%", ")", sep = ""), title= "Family A") + 
-   theme(legend.position = 'none', legend.text=element_text(size=9)) + theme(axis.text.x = element_text(size=8), axis.text.y = element_text(size = 8)) + theme(axis.title = element_text(size = 10), plot.title = element_text(size = 15))
-print(p)
-
-C_tse<- tse[ , tse$Family %in% "C"]
-p1 <- plotReducedDim(C_tse, "PCoA_BC", colour_by = "Sample", point_size= 2.5)
 ```
