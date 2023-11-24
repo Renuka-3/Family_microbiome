@@ -10,7 +10,7 @@ The project emphasize on analysis of skin microbiota in genetically related indi
 - [x] [Phyloseq](Phyloseq.Rmd): Create phyloseq object using metadata, otu table and taxa table
 - [x] [Beta diversity analysis](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
 - [x] [Alpha diversity analysis](Alphadiversity.md): alpha diversity estimated using Shannon diversity index for all co-factors.
-- [x] [CST analysis](CST.md):
+- [x] [supplimentory](supplimentory.md): Family-wise intergenerational analysis.
 - [x] [Taxonomy profile](taxonomyprofile.md): Core microbiome analysis is perfomred on skin microbiota.
 
 #### Analysis status document
