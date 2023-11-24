@@ -1,79 +1,3 @@
-    library(mia)
-    library(vegan)
-    library(knitr)
-    library(stringr)
-
-    # Load data
-    fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
-    #data(enterotype, package="mia")
-    # Covariates that are being analyzed
-    variable_names <- c("Location", "Diet", "Gender", "Age")
-
-    # Apply relative transform
-    tse <- transformCounts(fam_tse, method = "relabundance")
-
-    # Create a formula
-    formula <- as.formula(paste0("assay ~ ", str_c(variable_names, collapse = " + ")) )
-
-    # # Perform RDA
-    rda <- calculateRDA(tse, assay_name = "relabundance",
-                        formula = formula, distance = "bray", na.action = na.exclude)
-    # Get the rda object
-    rda <- attr(rda, "rda")
-    # Calculate p-value and variance for whole model
-    # Recommendation: use 999 permutations instead of 99
-    set.seed(436)
-    permanova <- anova.cca(rda, permutations = 99)
-    # Create a data.frame for results
-    rda_info <- as.data.frame(permanova)["Model", ]
-
-    # Calculate p-value and variance for each variable
-    # by = "margin" --> the order or variables does not matter
-    set.seed(4585)
-    permanova <- anova.cca(rda, by = "margin",  permutations = 99)
-    # Add results to data.frame
-    rda_info <- rbind(rda_info, permanova)
-
-    # Add info about total variance
-    rda_info[ , "Total variance"] <- rda_info["Model", 2] +
-        rda_info["Residual", 2]
-
-    # Add info about explained variance
-    rda_info[ , "Explained variance"] <- rda_info[ , 2] / 
-        rda_info[ , "Total variance"]
-
-    # Loop through variables, calculate homogeneity
-    homogeneity <- list()
-    # Get colDtaa
-    coldata <- colData(tse)
-    # Get assay
-    assay <- t(assay(tse, "relabundance"))
-    for( variable_name in rownames(rda_info) ){
-        # If data is continuous or discrete
-        if( variable_name %in% c("Model", "Residual") ||
-            length(unique(coldata[[variable_name]])) /
-            length(coldata[[variable_name]]) > 0.2 ){
-            # Do not calculate homogeneity for continuous data
-            temp <- NA
-        } else{
-            # Calculate homogeneity for discrete data
-            # Calculate homogeneity
-            set.seed(413)
-            temp <- anova(
-                betadisper( 
-                    vegdist(assay, method = "bray"),
-                    group = coldata[[variable_name]] ),
-                permutations = permutations )["Groups", "Pr(>F)"]
-        }
-        # Add info to the list
-        homogeneity[[variable_name]] <- temp
-    }
-    # Add homogeneity to information
-    rda_info[["Homogeneity p-value (NULL hyp: distinct/homogeneous --> permanova suitable)"]] <-
-        homogeneity
-
-    kable(rda_info)
-
 <table>
 <colgroup>
 <col style="width: 5%" />
@@ -102,379 +26,64 @@ distinct/homogeneous –&gt; permanova suitable)</th>
 <tr class="odd">
 <td style="text-align: left;">Model</td>
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">4.4514616</td>
-<td style="text-align: right;">3.9079141</td>
+<td style="text-align: right;">4.3486095</td>
+<td style="text-align: right;">3.7916841</td>
 <td style="text-align: right;">0.01</td>
 <td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.2284273</td>
+<td style="text-align: right;">0.2231494</td>
 <td style="text-align: left;">NA</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Location</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3.6793279</td>
-<td style="text-align: right;">16.1503105</td>
+<td style="text-align: right;">3.5764757</td>
+<td style="text-align: right;">15.5921868</td>
 <td style="text-align: right;">0.01</td>
 <td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.1888051</td>
-<td style="text-align: left;">0.104101….</td>
+<td style="text-align: right;">0.1835273</td>
+<td style="text-align: left;">0.215394….</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Diet</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.0931578</td>
-<td style="text-align: right;">0.4089139</td>
-<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">0.1500872</td>
+<td style="text-align: right;">0.6543277</td>
+<td style="text-align: right;">0.50</td>
 <td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.0047804</td>
+<td style="text-align: right;">0.0077017</td>
 <td style="text-align: left;">0.997865….</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Gender</td>
+<td style="text-align: left;">Sex</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.1577757</td>
-<td style="text-align: right;">0.6925520</td>
-<td style="text-align: right;">0.61</td>
+<td style="text-align: right;">0.1754532</td>
+<td style="text-align: right;">0.7649150</td>
+<td style="text-align: right;">0.54</td>
 <td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.0080963</td>
+<td style="text-align: right;">0.0090034</td>
 <td style="text-align: left;">0.536036….</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Age</td>
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">0.3459571</td>
-<td style="text-align: right;">0.7592847</td>
-<td style="text-align: right;">0.59</td>
+<td style="text-align: right;">0.3421103</td>
+<td style="text-align: right;">0.7457408</td>
+<td style="text-align: right;">0.63</td>
 <td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.0177528</td>
+<td style="text-align: right;">0.0175554</td>
 <td style="text-align: left;">0.717219….</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Residual</td>
 <td style="text-align: right;">66</td>
-<td style="text-align: right;">15.0359735</td>
+<td style="text-align: right;">15.1388257</td>
 <td style="text-align: right;">NA</td>
 <td style="text-align: right;">NA</td>
 <td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.7715727</td>
+<td style="text-align: right;">0.7768506</td>
 <td style="text-align: left;">NA</td>
 </tr>
 </tbody>
 </table>
-
-    library("devtools")
-    library("ggord")
-
-    # Load ggord for plotting
-    #if(!require("ggord")){
-    #    if(!require("devtools")){
-    #        install.packages("devtools")
-    #        library("devtools")
-    #    }
-    #    install_github("https://github.com/fawda123/ggord/")
-    #    library("ggord")
-    #}
-    #if(!require("ggplot2")){
-    #    install.packages("ggplot2")
-    #    library("ggplot2")
-    #}
-
-    library(ggplot2)
-    library(ggord)
-    # Since na.exclude was used, if there were rows missing information, they were 
-    # dropped off. Subset coldata so that it matches with rda.
-    coldata <- coldata[ rownames(rda$CCA$wa), ]
-
-    # Adjust names
-    # Get labels of vectors
-    vec_lab_old <- rownames(rda$CCA$biplot)
-    library(rlang)
-    # Loop through vector labels
-    vec_lab <- sapply(vec_lab_old, FUN = function(name){
-        # Get the variable name
-        variable_name <- variable_names[ str_detect(name, variable_names) ]
-        # If the vector label includes also group name
-        if( !any(name %in% variable_names) ){
-            # Get the group names
-            group_name <- unique( coldata[[variable_name]] )[ 
-            which( paste0(variable_name, unique( coldata[[variable_name]] )) == name ) ]
-            # Modify vector so that group is separated from variable name
-            new_name <- paste0(variable_name, " \U2012 ", group_name)
-        } else{
-            new_name <- name
-        }
-        # Add percentage how much this variable explains, and p-value
-        new_name <- expr(paste(!!new_name, " (", 
-                               !!format(round( rda_info[variable_name, "Explained variance"]*100, 1), nsmall = 1), 
-                               "%, ",italic("P"), " = ", 
-                               !!gsub("0\\.","\\.", format(round( rda_info[variable_name, "Pr(>F)"], 3), 
-                                                           nsmall = 3)), ")"))
-
-        return(new_name)
-    })
-    # Add names
-    names(vec_lab) <- vec_lab_old
-
-    # Create labels for axis
-    xlab <- paste0("RDA1 (", format(round( rda$CCA$eig[[1]]/rda$CCA$tot.chi*100, 1), nsmall = 1 ), "%)")
-    ylab <- paste0("RDA2 (", format(round( rda$CCA$eig[[2]]/rda$CCA$tot.chi*100, 1), nsmall = 1 ), "%)")
-
-    # Create a plot        
-    plot <- ggord(rda, grp_in = coldata[["Location"]], vec_lab = vec_lab,
-                  alpha = 0.5,
-                  size = 4, addsize = -4,
-                  #ext= 0.7, 
-                  txt = 3.5, repel = TRUE, 
-                  #coord_fix = FALSE
-              ) + 
-        # Adjust titles and labels
-        guides(colour = guide_legend("Location"),
-               fill = guide_legend("Location"),
-               group = guide_legend("Location"),
-               shape = guide_legend("Location"),
-               x = guide_axis(xlab),
-               y = guide_axis(ylab)) +
-        theme( axis.title = element_text(size = 10) )
-    plot
 
 ![](RDA_files/figure-markdown_strict/DBRDA-1.png)
-
-    library(mia)
-    library(vegan)
-    library(knitr)
-    library(stringr)
-
-    # Load data
-    fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
-    #data(enterotype, package="mia")
-    # Covariates that are being analyzed
-    variable_names <- c("Family", "Location", "Diet", "Gender", "Age")
-
-    # Apply relative transform
-    tse <- transformCounts(fam_tse, method = "relabundance")
-
-    # Create a formula
-    formula <- as.formula(paste0("assay ~ ", str_c(variable_names, collapse = " + ")) )
-
-    # # Perform RDA
-    rda <- calculateRDA(tse, assay_name = "relabundance",
-                        formula = formula, distance = "bray", na.action = na.exclude)
-    # Get the rda object
-    rda <- attr(rda, "rda")
-    # Calculate p-value and variance for whole model
-    # Recommendation: use 999 permutations instead of 99
-    set.seed(436)
-    permanova <- anova.cca(rda, permutations = 99)
-    # Create a data.frame for results
-    rda_info <- as.data.frame(permanova)["Model", ]
-
-    # Calculate p-value and variance for each variable
-    # by = "margin" --> the order or variables does not matter
-    set.seed(4585)
-    permanova <- anova.cca(rda, by = "margin",  permutations = 99)
-    # Add results to data.frame
-    rda_info <- rbind(rda_info, permanova)
-
-    # Add info about total variance
-    rda_info[ , "Total variance"] <- rda_info["Model", 2] +
-        rda_info["Residual", 2]
-
-    # Add info about explained variance
-    rda_info[ , "Explained variance"] <- rda_info[ , 2] / 
-        rda_info[ , "Total variance"]
-
-    # Loop through variables, calculate homogeneity
-    homogeneity <- list()
-    # Get colDtaa
-    coldata <- colData(tse)
-    # Get assay
-    assay <- t(assay(tse, "relabundance"))
-    for( variable_name in rownames(rda_info) ){
-        # If data is continuous or discrete
-        if( variable_name %in% c("Model", "Residual") ||
-            length(unique(coldata[[variable_name]])) /
-            length(coldata[[variable_name]]) > 0.2 ){
-            # Do not calculate homogeneity for continuous data
-            temp <- NA
-        } else{
-            # Calculate homogeneity for discrete data
-            # Calculate homogeneity
-            set.seed(413)
-            temp <- anova(
-                betadisper( 
-                    vegdist(assay, method = "bray"),
-                    group = coldata[[variable_name]] ),
-                permutations = permutations )["Groups", "Pr(>F)"]
-        }
-        # Add info to the list
-        homogeneity[[variable_name]] <- temp
-    }
-    # Add homogeneity to information
-    rda_info[["Homogeneity p-value (NULL hyp: distinct/homogeneous --> permanova suitable)"]] <-
-        homogeneity
-
-    kable(rda_info)
-
-<table>
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 2%" />
-<col style="width: 7%" />
-<col style="width: 6%" />
-<col style="width: 4%" />
-<col style="width: 10%" />
-<col style="width: 12%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">Df</th>
-<th style="text-align: right;">SumOfSqs</th>
-<th style="text-align: right;">F</th>
-<th style="text-align: right;">Pr(&gt;F)</th>
-<th style="text-align: right;">Total variance</th>
-<th style="text-align: right;">Explained variance</th>
-<th style="text-align: left;">Homogeneity p-value (NULL hyp:
-distinct/homogeneous –&gt; permanova suitable)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Model</td>
-<td style="text-align: right;">19</td>
-<td style="text-align: right;">10.1352765</td>
-<td style="text-align: right;">2.9660159</td>
-<td style="text-align: right;">0.01</td>
-<td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.5200929</td>
-<td style="text-align: left;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Family</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">5.6838149</td>
-<td style="text-align: right;">2.2573732</td>
-<td style="text-align: right;">0.01</td>
-<td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.2916656</td>
-<td style="text-align: left;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Location</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0.3749730</td>
-<td style="text-align: right;">2.0849301</td>
-<td style="text-align: right;">0.07</td>
-<td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.0192418</td>
-<td style="text-align: left;">0.104101….</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Diet</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0.0416867</td>
-<td style="text-align: right;">0.2317872</td>
-<td style="text-align: right;">0.91</td>
-<td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.0021392</td>
-<td style="text-align: left;">0.997865….</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Gender</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0.1205138</td>
-<td style="text-align: right;">0.6700823</td>
-<td style="text-align: right;">0.61</td>
-<td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.0061842</td>
-<td style="text-align: left;">0.536036….</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Age</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0.4007024</td>
-<td style="text-align: right;">1.1139955</td>
-<td style="text-align: right;">0.40</td>
-<td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.0205621</td>
-<td style="text-align: left;">0.717219….</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Residual</td>
-<td style="text-align: right;">52</td>
-<td style="text-align: right;">9.3521587</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">19.48744</td>
-<td style="text-align: right;">0.4799071</td>
-<td style="text-align: left;">NA</td>
-</tr>
-</tbody>
-</table>
-
-    library("devtools")
-    library("ggord")
-
-    library(ggplot2)
-    library(ggord)
-    # Since na.exclude was used, if there were rows missing information, they were 
-    # dropped off. Subset coldata so that it matches with rda.
-    coldata <- coldata[ rownames(rda$CCA$wa), ]
-
-    # Adjust names
-    # Get labels of vectors
-    vec_lab_old <- rownames(rda$CCA$biplot)
-    library(rlang)
-    # Loop through vector labels
-    vec_lab <- sapply(vec_lab_old, FUN = function(name){
-        # Get the variable name
-        variable_name <- variable_names[ str_detect(name, variable_names) ]
-        # If the vector label includes also group name
-        if( !any(name %in% variable_names) ){
-            # Get the group names
-            group_name <- unique( coldata[[variable_name]] )[ 
-            which( paste0(variable_name, unique( coldata[[variable_name]] )) == name ) ]
-            # Modify vector so that group is separated from variable name
-            new_name <- paste0(variable_name, " \U2012 ", group_name)
-        } else{
-            new_name <- name
-        }
-        # Add percentage how much this variable explains, and p-value
-        new_name <- expr(paste(!!new_name, " (", 
-                               !!format(round( rda_info[variable_name, "Explained variance"]*100, 1), nsmall = 1), 
-                               "%, ",italic("P"), " = ", 
-                               !!gsub("0\\.","\\.", format(round( rda_info[variable_name, "Pr(>F)"], 3), 
-                                                           nsmall = 3)), ")"))
-
-        return(new_name)
-    })
-    # Add names
-    names(vec_lab) <- vec_lab_old
-
-    # Create labels for axis
-    xlab <- paste0("RDA1 (", format(round( rda$CCA$eig[[1]]/rda$CCA$tot.chi*100, 1), nsmall = 1 ), "%)")
-    ylab <- paste0("RDA2 (", format(round( rda$CCA$eig[[2]]/rda$CCA$tot.chi*100, 1), nsmall = 1 ), "%)")
-
-    # Create a plot        
-    plot <- ggord(rda, grp_in = coldata[["Family"]], vec_lab = vec_lab,
-                  alpha = 0.5,
-                  size = 4, addsize = -4,
-                  #ext= 0.7, 
-                  txt = 3.5, repel = TRUE, 
-                  #coord_fix = FALSE
-              ) + 
-        # Adjust titles and labels
-        guides(colour = guide_legend("Family"),
-               fill = guide_legend("Family"),
-               group = guide_legend("Family"),
-               shape = guide_legend("Family"),
-               x = guide_axis(xlab),
-               y = guide_axis(ylab)) +
-        theme( axis.title = element_text(size = 10) )
-    plot
-
-    ## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider increasing
-    ## max.overlaps
-
-![](RDA_files/figure-markdown_strict/setup-1.png)
