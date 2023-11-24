@@ -1,5 +1,5 @@
 ---
-title: "G1,G2,G3"
+title: "Intergeneration_analysis"
 author: "Renuka"
 date: "2023-09-18"
 output: html_document
@@ -81,7 +81,7 @@ a <- ggplot(mergedcities, aes(x=grp,y=value))+
     geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
     #geom_signif(comparisons = list(c("within_pairs", "between_pairs")), map_signif_level = FALSE) 
   theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "A. G1-G2 comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
-print(a)
+#print(a)
 ```
 
 # G2-G3 (location, gender matched)
@@ -157,7 +157,7 @@ b <- ggplot(mergedcities1, aes(x=grp1,y=value1))+
     geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
     #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + 
   labs(x = "", y= "Bray-Curtis index", title = "B. G2-G3 comparision") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
-print(b)
+#print(b)
 ```
 
 
@@ -234,7 +234,7 @@ c <- ggplot(mergedcities2, aes(x=grp2,y=value2))+
     geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
     #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + 
   labs(x = "", y= "Bray-Curtis index", title = "C. G1-G3 comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
-print(c) 
+#print(c) 
 
 ## Multiple pairwise comparison 
 #m <- c()
@@ -321,7 +321,7 @@ E <- ggplot(mergedcities3, aes(x=grp3,y=value3))+
     geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
     #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + 
   theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "D.Father-child comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
-print(E) 
+#print(E) 
 ```
 
 
@@ -402,7 +402,7 @@ L <- ggplot(mergedcities4, aes(x=grp4,y=value4))+
     geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
     #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + 
   theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "E. Mother-child comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
-print(L)
+#print(L)
 
 ## Multiple pairwise comparison 
 #m <- c()
@@ -497,7 +497,7 @@ tp <- ggplot(test,aes(x=grp5,y=value5))+
     geom_jitter(width= 0.05, size= 1.7, aes(colour=City)) +
   #geom_signif(comparisons = list(c("motherchild", "fatherchild")), map_signif_level = FALSE) + 
   theme(text = element_text(size = 5)) + labs(x = "", y= "Bray-Curtis index", title = "F.Parent-child comparison within family") + scale_x_discrete(labels=c("motherchild" = "Mother-child", "fatherchild" = "Father-child")) + theme_bw(base_size = 20) + theme(legend.position = "none")
-print(tp)
+#print(tp)
 
 ## Multiple pairwise comparison 
 l <- c()
