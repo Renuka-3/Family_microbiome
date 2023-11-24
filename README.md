@@ -11,7 +11,7 @@ The project emphasize on analysis of skin microbiota in genetically related indi
 - [x] [Inter-generational analysis](Intergeneration_analysis.md): Core microbiome analysis is perfomred on skin microbiota.
 - [Tables](tables.md): 
    1. Table1- Family data
-              2. Which is numberedTable 2- PERMANOVA
+     2. Which is numberedTable 2- PERMANOVA
   Table 3- Most prevalent genera (detection threshold=0.1%, prevalence>1%).
   Table 4-  Most prevalent Phyla (detection threshold=0.1%, prevalence>1%).
 
