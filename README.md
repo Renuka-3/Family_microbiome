@@ -1,5 +1,5 @@
 # Family microbiome
-## The present study investigates the differences in skin microbiota taxonomic diversity and composition within and between families. The study involves 72 healthy individuals from fifteen families, spanning three generations. ##
+## The present study involved seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ##
 
 ### Family data analysis
 
