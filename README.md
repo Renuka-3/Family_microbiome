@@ -3,7 +3,7 @@
 
 ### Family data analysis
 
-- [TSE](fam_tse.Rmd): Create TSE object using metadata, otu table and taxa table
+- [TSE](fam_TSE.Rmd): Create TSE object using metadata, otu table and taxa table
 - [Figure 2/ Alpha diversity analysis](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors.
 - [Figure 3 /Beta diversity analysis](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
 - [Figure 4/ dbRDA](RDA.md)
