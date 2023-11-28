@@ -16,4 +16,4 @@
    4. Table 4-  Most prevalent Phyla (detection threshold=0.1%, prevalence>1%).
 
 #### supplementary figure
-- [supplimentory figure 1](supplimentory.md): Family-wise inter-generational analysis.
+- [supplementary figure 1](supplimentory.md): Family-wise inter-generational analysis.
