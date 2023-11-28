@@ -88,39 +88,3 @@ hm <- Heatmap(sub_assay,
 print(hm)
 ```
 
-
-
-```{r core, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-library(mia)
-library(miaViz)
-library(dplyr)
-fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
-tse <- relAbundanceCounts(fam_tse)
-tse_Phylum <- agglomerateByRank(tse, rank ="Phylum", onRankOnly=TRUE)
-top_taxa <- getTopTaxa(tse_Phylum,top =6, detection = 0.1/100, prevalence = 1/100, method = "prevalence", assay_name = "relabundance")
-Phylum_renamed <- lapply(rowData(tse)$Phylum,
-                   function(x){if (x %in% top_taxa) {x} else {"Other"}})
-rowData(tse)$Phylum <- as.character(Phylum_renamed)
-
-merged <- mergeCols(tse, colData(tse)$Family)
-merged1 <- transformCounts(merged, abund_values = "counts",
-                              method = "relabundance")
-ttse_list <- splitOn(merged1, f= "Location")
-ttse_Ahmednagar <- ttse_list[[1]]
-ttse_Pune <- ttse_list[[2]]
-
-
-tse_subsetPune <- merged1[ , merged1$Location %in% "Pune"]
-a <- plotAbundance(tse_subsetPune, assay_name="relabundance", rank = "Genus",
-              #order_rank_by="abund", 
-              order_sample_by = "Firmicutes", add_x_text = TRUE)+ labs(x = "Families", y = "Relative abundance (%)", title = "C. Pune")
-#print(a)
-
-tse_subsetAhmednagar <- merged1[ , merged1$Location %in% "Ahmednagar"]
-b <- plotAbundance(tse_subsetAhmednagar, assay_name="relabundance", rank = "Genus",
-              #order_rank_by="abund", 
-              order_sample_by = "firmicutes", add_x_text = TRUE) + labs(x = "Families", y = "", title = "C. Ahmednagar") + theme(axis.text.y=element_blank())
-#print(b)
-c <- b+a
-print(c)
-```
