@@ -7,7 +7,7 @@
 - [Figure 2/ Alpha diversity analysis](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors.
 - [Figure 3 /Beta diversity analysis](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
 - [Figure 4/ dbRDA](RDA.md)
-- [Figure 5/ most prevalent microbiome)[tse_core.md): Location-wise relative abundances of the most prevalent phyla and genera in families.
+- [Figure 5/ most prevalent microbiome](tse_core.md): Location-wise relative abundances of the most prevalent phyla and genera in families.
 - [Figure 6/ Inter-generational analysis](Intergeneration_analysis.md): within and between family member comparison across three generations.
 - [Tables](tables.md): 
    1. Table1- Family data
