@@ -8,7 +8,7 @@
 - [Figure 3 /Beta diversity analysis](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
 - [Figure 4/ dbRDA](RDA.md)
 - [Figure 5/ most prevalent microbiome](tse_core.md): Location-wise relative abundances of the most prevalent phyla and genera in families.
-- [Figure 6/ Inter-generational analysis](Intergeneration_analysis.md): within and between family member comparison across three generations.
+- [Figure 6/ Inter-generational analysis](Intergeneration_analysis.md): within and between family comparison across three generations.
 - [Tables](tables.md): 
    1. Table1- Family data
    2. Table 2- PERMANOVA
