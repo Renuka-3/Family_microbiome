@@ -9,7 +9,6 @@ Fam_TSE.Rmd
 
 ### Analysis scripts
 Primary analysis packages are mia (1.6.0) (Ernst et al., 2022) and miaViz (1.6.0) (Ernst et al., 2022)
-
 - [Figure 2 /Alpha diversity analysis](tse_alpha.Rmd): alpha diversity estimated using Shannon diversity index for all co-factors. 
 - [Figure 3 /Beta diversity analysis](tse_beta.Rmd): PCoA and PERMANOVA analysis was carry out with confounding factors.
 - [Figure 4 /dbRDA](RDA.Rmd)
