@@ -1,5 +1,5 @@
 ---
-title: "supplimentory"
+title: "supplementary"
 author: "Renuka"
 date: "2023-09-25"
 output: html_document
@@ -31,7 +31,7 @@ A <- ggplot(df, aes(x = G, y = shannon)) +
   geom_point(size=3)+ 
   #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "A") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(A)
+
 
 ##Family F
 tse1 <- tse[ , tse$G %in% "G2"]
@@ -48,7 +48,7 @@ F1 <- ggplot(df, aes(x = G, y = shannon)) +
  #geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "F") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(F1)
+
 
 ##Family K
 tse1 <- tse[ , tse$G %in% "G2"]
@@ -64,7 +64,7 @@ K <- ggplot(df, aes(x = G, y = shannon)) +  geom_point(size=3) +
 # geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "K") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(K)
+
 
 ##Family M
 tse1 <- tse[ , tse$G %in% "G2"]
@@ -81,7 +81,7 @@ geom_point(size=3) +
  #geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "M") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(M)
+
 
 ##Family N
 tse1 <- tse[ , tse$G %in% "G2"]
@@ -98,7 +98,7 @@ N <- ggplot(df, aes(x = G, y = shannon)) +
  #geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "N") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(N)
+
 
 ##Family I
 tse1 <- tse[ , tse$G %in% "G2"]
@@ -115,7 +115,8 @@ geom_point(size=3) +
  #geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G2", "G3")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "I") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(I)
+
+
 library(gridExtra)
 gridExtra::grid.arrange(A, F1, I, K, M, N, nrow = 2)
 ```
@@ -152,7 +153,7 @@ c <- ggplot(df, aes(x = G, y = shannon)) +
 # geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "C") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(c)
+
 
 
 ###Family G
@@ -171,7 +172,7 @@ g <- ggplot(df, aes(x = G, y = shannon)) +
 # geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "G") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(g)
+
 
 
 ###Family H
@@ -190,7 +191,7 @@ h <- ggplot(df, aes(x = G, y = shannon)) +
 # geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "H") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(h)
+
 
 
 ###Family I
@@ -209,7 +210,7 @@ geom_point(size=3) +
  #geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "I") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(i)
+
 
 ###Family J
 
@@ -227,7 +228,7 @@ geom_point(size=3) +
  #geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "J") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(j)
+
 
 
 ###Family O1
@@ -246,7 +247,7 @@ geom_point(size=3) +
  #geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "O1") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(o1)
+
 
 ###Family O2
 
@@ -264,7 +265,7 @@ o2 <- ggplot(df, aes(x = G, y = shannon)) +
 # geom_jitter(width = 0.05) + 
   #geom_signif(comparisons = list(c("G1", "G2")), map_signif_level = FALSE, na.rm = FALSE)  + 
   labs(y = "Shannon index", x = "", title = "O2") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 18), axis.title = element_text(size = 20)) 
-print(o2)
+
 library(gridExtra)
 gridExtra::grid.arrange(c, g, h, i, j, o1, o2, nrow = 2)
 ```
