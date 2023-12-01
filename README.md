@@ -17,7 +17,7 @@ Use the following scripts to perform the respective analysis
 - [supplementary figure 1](supplimentory.Rmd): Family-wise inter-generational analysis.
 
  ### Results
- The generated results can be visualized at
+ The generated results can be visualized here
 - [Figure 2 /Alpha diversity analysis](tse_alpha.md) 
 - [Figure 3 /Beta diversity analysis](tse_beta.md)
 - [Figure 4 /dbRDA](RDA.md)
