@@ -2,7 +2,7 @@
 ## The present study involves seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ##
 
 ### Generate TSE object
-The data uses TreeSummarizedExperiment data container
+Create TSE object using metadata, otu table and taxa table. The data uses TreeSummarizedExperiment data container. 
 ```bash
 Fam_TSE.Rmd
 ```
@@ -15,8 +15,6 @@ Primary analysis packages are mia (1.6.0) (Ernst et al., 2022) and miaViz (1.6.0
 - [Figure 4 /dbRDA](RDA.Rmd)
 - [Figure 5 /most prevalent microbiome](tse_core.Rmd): Location-wise relative abundances of the most prevalent phyla and genera in families.
 - [Figure 6 /Inter-generational analysis](Intergeneration_analysis.Rmd): within and between family comparison across three generations.
-
-- [TSE](fam_TSE.Rmd): Create TSE object using metadata, otu table and taxa table
 
  ### Results
 - [Figure 2 /Alpha diversity analysis](tse_alpha.md) 
