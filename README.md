@@ -33,8 +33,6 @@ Use the following scripts to perform the respective analysis
 - [supplementary figure 1](supplimentory.md): Visualisation of result
 
 ### Preprint available at
-### Authors
-#### References
-- Ernst F, Shetty S, Borman T, Lahti L. 2022. mia: Microbiome analysis. R package version 1.6.0.
-- Ernst F, Borman T, Lahti L. 2022. miaViz: Microbiome Analysis Plotting and Visualization. R package version 1.6.0.
+
+### License
  
