@@ -1,11 +1,20 @@
 # Family microbiome
 ## The present study involves seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ##
 
-#### Generate TSE object from script
+### Generate TSE object from script
 ```bash
 Fam_TSE.Rmd
 ```
-### Family data analysis
+### Analysis source codes
+```bash
+- [Figure 2 /Alpha diversity analysis](tse_alpha.Rmd): alpha diversity estimated using Shannon diversity index for all co-factors. This analysis can be done using tse_alpha.Rmd file.
+```
+#### Analysis source codes
+- [Figure 2 /Alpha diversity analysis](tse_alpha.Rmd): alpha diversity estimated using Shannon diversity index for all co-factors. This analysis can be done using tse_alpha.Rmd file.
+- [Figure 3 /Beta diversity analysis](tse_beta.Rmd): PCoA and PERMANOVA analysis was carried out with confounding factors.
+- [Figure 4 /dbRDA](RDA.md)
+- [Figure 5 /most prevalent microbiome](tse_core.md): Location-wise relative abundances of the most prevalent phyla and genera in families.
+- [Figure 6 /Inter-generational analysis](Intergeneration_analysis.md): within and between family comparison across three generations.
 
 - [TSE](fam_TSE.Rmd): Create TSE object using metadata, otu table and taxa table
 - [Figure 2 /Alpha diversity analysis](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors. This analysis can be done using tse_alpha.Rmd file. 
