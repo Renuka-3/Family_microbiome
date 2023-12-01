@@ -8,7 +8,7 @@ Fam_TSE.Rmd
 ```
 
 ### Analysis scripts
-Primary analysis packages are mia (1.6.0) (Ernst et al., 2022) and miaViz (1.6.0) (Ernst et al., 2022)
+Use the following scripts to perform the respective analysis
 - [Figure 2 /Alpha diversity analysis](tse_alpha.Rmd): alpha diversity estimated using Shannon diversity index for all co-factors. 
 - [Figure 3 /Beta diversity analysis](tse_beta.Rmd): PCoA and PERMANOVA analysis was carry out with confounding factors.
 - [Figure 4 /dbRDA](RDA.Rmd)
@@ -16,6 +16,7 @@ Primary analysis packages are mia (1.6.0) (Ernst et al., 2022) and miaViz (1.6.0
 - [Figure 6 /Inter-generational analysis](Intergeneration_analysis.Rmd): within and between family comparison across three generations.
 
  ### Results
+ The generated results can be visualize at
 - [Figure 2 /Alpha diversity analysis](tse_alpha.md) 
 - [Figure 3 /Beta diversity analysis](tse_beta.md)
 - [Figure 4 /dbRDA](RDA.md)
@@ -28,8 +29,8 @@ Primary analysis packages are mia (1.6.0) (Ernst et al., 2022) and miaViz (1.6.0
    4. Table 4-  Most prevalent Phyla (detection threshold=0.1%, prevalence>1%).
 
 #### supplementary figure
-- [supplementary figure 1](supplimentory.Rmd): Family-wise inter-generational analysis.
-- [supplementary figure 1](supplimentory.md): Family-wise inter-generational analysis.
+- [supplementary figure 1](supplimentory.Rmd): Codes to perfom Family-wise inter-generational analysis.
+- [supplementary figure 1](supplimentory.md): Visualisation of result
 
 ### Preprint available at
 ### Authors
