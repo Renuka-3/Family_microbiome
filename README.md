@@ -15,8 +15,6 @@ Primary analysis packages are mia (1.6.0) (Ernst et al., 2022) and miaViz (1.6.0
 - [Figure 5 /most prevalent microbiome](tse_core.Rmd): Location-wise relative abundances of the most prevalent phyla and genera in families.
 - [Figure 6 /Inter-generational analysis](Intergeneration_analysis.Rmd): within and between family comparison across three generations.
   
-<br/><br/>
-
  ### Results
 - [Figure 2 /Alpha diversity analysis](tse_alpha.md) 
 - [Figure 3 /Beta diversity analysis](tse_beta.md)
