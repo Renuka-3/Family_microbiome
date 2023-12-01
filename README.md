@@ -3,7 +3,7 @@
 
 #### Generate TSE object from script
 ```bash
-[TSE](Fam_TSE.Rmd)
+Fam_TSE.Rmd
 ```
 ### Family data analysis
 
