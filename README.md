@@ -18,7 +18,7 @@ Primary analysis packages are mia (1.6.0) (Ernst et al., 2022) and miaViz (1.6.0
 
 - [TSE](fam_TSE.Rmd): Create TSE object using metadata, otu table and taxa table
 
-- ### Results
+ ### Results
 - [Figure 2 /Alpha diversity analysis](tse_alpha.md) 
 - [Figure 3 /Beta diversity analysis](tse_beta.md)
 - [Figure 4 /dbRDA](RDA.md)
@@ -30,13 +30,13 @@ Primary analysis packages are mia (1.6.0) (Ernst et al., 2022) and miaViz (1.6.0
    3. Table 3- Most prevalent genera (detection threshold=0.1%, prevalence>1%).
    4. Table 4-  Most prevalent Phyla (detection threshold=0.1%, prevalence>1%).
 
-- #### supplementary figure
+#### supplementary figure
 - [supplementary figure 1](supplimentory.Rmd): Family-wise inter-generational analysis.
 - [supplementary figure 1](supplimentory.md): Family-wise inter-generational analysis.
 
-- ### Preprint available at
-- ### Authors
-- #### References
+### Preprint available at
+### Authors
+#### References
 - Ernst F, Shetty S, Borman T, Lahti L. 2022. mia: Microbiome analysis. R package version 1.6.0.
 - Ernst F, Borman T, Lahti L. 2022. miaViz: Microbiome Analysis Plotting and Visualization. R package version 1.6.0.
  
