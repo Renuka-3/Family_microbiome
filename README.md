@@ -1,4 +1,4 @@
-# Family microbiome
+# Skin microbiota variation in Indian families
 ## The present study involves seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ##
 
 ### Generate TSE object
