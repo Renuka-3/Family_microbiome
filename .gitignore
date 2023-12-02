@@ -7,3 +7,6 @@ inputdata/processed/TSE/fam_tse.rda
 inputdata/processed/TSE/fam_tse.rds
 .RData
 .Rhistory
+data/Metadata.xlsx
+data/OTU_table.xlsx
+data/Taxa_table.xlsx
