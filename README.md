@@ -3,11 +3,13 @@
 
 ### Generate TSE object
 Create TSE object using metadata, otu table, and taxa table. The data uses TreeSummarizedExperiment data container. 
+To run the R script use command- rmarkdown::render("fam_TSE.Rmd") 
 ```bash
-Fam_TSE.Rmd
+fam_TSE.Rmd
 ```
 ### Analysis scripts & visualisation
-Use the following scripts to perform the respective analysis
+Use the following  R scripts to perform the respective analysis
+To run the script use command-  rmarkdown::render("FILENAME.Rmd")
 - [Alpha diversity analysis](tse_alpha.Rmd) | [Figure 2](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors. 
 - [Beta diversity analysis](tse_beta.Rmd) | [Figure 3](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
 - [dbRDA](RDA.Rmd) | [Figure 4](RDA.md): distance-based Redundancy analysis is performed for confounding factors.
