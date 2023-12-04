@@ -20,13 +20,13 @@ To run the script use command-  rmarkdown::render("FILENAME.Rmd")
 ### Analysis scripts & visualisation
 Use the following  R scripts to perform the respective analysis
 To run the script use command-  rmarkdown::render("FILENAME.Rmd")
-- Figure 2 [Alpha diversity analysis](tse_alpha.Rmd) | (visualization)(tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors. 
-- [Beta diversity analysis](tse_beta.Rmd) | [Figure 3](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
-- [dbRDA](RDA.Rmd) | [Figure 4](RDA.md): distance-based Redundancy analysis is performed for confounding factors.
-- [most prevalent microbiome](tse_core.Rmd) | [Figure 5](tse_core.md): Location-wise relative abundances of the most prevalent phyla and genera in families.
-- [Inter-generational analysis](Intergeneration_analysis.Rmd) | [Figure 6](Intergeneration_analysis.md): within and between family comparison across three generations.
-- [supplementary](supplementary.Rmd) | [supplementary figure 1](supplementary.md): Family-wise inter-generational analysis.
-- 
+- Figure 2 [Alpha diversity analysis](tse_alpha.Rmd) | [visualization](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors. 
+- Figure 3 [Beta diversity analysis](tse_beta.Rmd) | [visualization](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
+- Figure 4 [dbRDA](RDA.Rmd) | [visualization](RDA.md): distance-based Redundancy analysis is performed for confounding factors.
+- Figure 5 [most prevalent microbiome](tse_core.Rmd) | [visualization](tse_core.md): Location-wise relative abundances of the most prevalent phyla and genera in families.
+- Figure 6 [Inter-generational analysis](Intergeneration_analysis.Rmd) | [visualization](Intergeneration_analysis.md): within and between family comparison across three generations.
+- supplementary figure 1 [supplementary](supplementary.Rmd) | [visualization](supplementary.md): Family-wise inter-generational analysis.
+  
 ### Preprint available at
 
 ### License
