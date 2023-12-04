@@ -20,7 +20,7 @@ To run the script use command-  rmarkdown::render("FILENAME.Rmd")
 ### Analysis scripts & visualisation
 Use the following  R scripts to perform the respective analysis
 To run the script use command-  rmarkdown::render("FILENAME.Rmd")
-- Figure 2 (tse_alpha.Rmd) | (tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors. 
+- Figure 2 [Alpha diversity analysis](tse_alpha.Rmd) | (visualization)(tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors. 
 - [Beta diversity analysis](tse_beta.Rmd) | [Figure 3](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
 - [dbRDA](RDA.Rmd) | [Figure 4](RDA.md): distance-based Redundancy analysis is performed for confounding factors.
 - [most prevalent microbiome](tse_core.Rmd) | [Figure 5](tse_core.md): Location-wise relative abundances of the most prevalent phyla and genera in families.
