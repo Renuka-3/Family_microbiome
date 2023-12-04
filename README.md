@@ -25,8 +25,10 @@ rmarkdown::render("FILENAME.Rmd")
 - [Inter-generational analysis](Intergeneration_analysis.Rmd) | [Figure 6](Intergeneration_analysis.md): within and between family comparison across three generations.
 - [supplementary](supplementary.Rmd) | [supplementary figure 1](supplementary.md): Family-wise inter-generational analysis.
 
-  
-### Preprint available at
+### Authors
+Renuka Potbhare, Ameeta Ravikumar, Eveliina Munukkac, Richa Ashmaa and Leo Lahti
+
+### Preprint is available at
 
 ### License
  
