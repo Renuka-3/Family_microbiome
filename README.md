@@ -13,6 +13,8 @@ rmarkdown::render("fam_TSE.Rmd")
 ## Dependencies
  The primary R packages are mia and miaViz
  
+ For installation visit DOI: 10.18129/B9.bioc.mia and DOI: 10.18129/B9.bioc.miaViz
+ 
 ## Analysis scripts & visualisation
 Use the following scripts to perform the respective analysis.
 
