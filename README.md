@@ -10,7 +10,9 @@ To generate TSE object in RStudio run the script using the following command
 ```
 rmarkdown::render("fam_TSE.Rmd")
 ```
-
+## Dependencies
+ The primary R packages are mia and miaViz
+ 
 ## Analysis scripts & visualisation
 Use the following scripts to perform the respective analysis.
 
