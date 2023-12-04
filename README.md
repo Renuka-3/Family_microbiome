@@ -9,21 +9,12 @@ Fam_TSE.Rmd
 ### Analysis scripts
 Use the following scripts to perform the respective analysis
 - [Alpha diversity analysis](tse_alpha.Rmd) | [Figure 2](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors. 
-- [Figure 3 /Beta diversity analysis](tse_beta.Rmd): PCoA and PERMANOVA analysis was carried out with confounding factors.
-- [Figure 4 /dbRDA](RDA.Rmd)
-- [Figure 5 /most prevalent microbiome](tse_core.Rmd): Location-wise relative abundances of the most prevalent phyla and genera in families.
-- [Figure 6 /Inter-generational analysis](Intergeneration_analysis.Rmd): within and between family comparison across three generations.
-- [supplementary figure 1](supplementary.Rmd): Family-wise inter-generational analysis.
+- [Beta diversity analysis](tse_beta.Rmd) | [Figure 3](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
+- [dbRDA](RDA.Rmd) | [Figure 4](RDA.md)
+- [most prevalent microbiome](tse_core.Rmd) | [Figure 5](tse_core.md): Location-wise relative abundances of the most prevalent phyla and genera in families.
+- [Inter-generational analysis](Intergeneration_analysis.Rmd) | [Figure 6](Intergeneration_analysis.md): within and between family comparison across three generations.
+- [supplementary](supplementary.Rmd) | [supplementary figure 1](supplementary.md): Family-wise inter-generational analysis.
 
-  
-### Analysis scripts
-Use the following scripts to perform the respective analysis
-- [Figure 2 /Alpha diversity analysis](tse_alpha.Rmd): alpha diversity estimated using Shannon diversity index for all co-factors. 
-- [Figure 3 /Beta diversity analysis](tse_beta.Rmd): PCoA and PERMANOVA analysis was carried out with confounding factors.
-- [Figure 4 /dbRDA](RDA.Rmd)
-- [Figure 5 /most prevalent microbiome](tse_core.Rmd): Location-wise relative abundances of the most prevalent phyla and genera in families.
-- [Figure 6 /Inter-generational analysis](Intergeneration_analysis.Rmd): within and between family comparison across three generations.
-- [supplementary figure 1](supplementary.Rmd): Family-wise inter-generational analysis.
 
  ### Results
  The generated results can be visualized here
