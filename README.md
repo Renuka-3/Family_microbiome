@@ -38,5 +38,6 @@ This research work is licensed under the Artistic 2.0 license
 <!-- badges: start -->
 
 [![License-Artistic_2.0-blue](https://img.shields.io/badge/License-Artistic_2.0-blue)(https://github.com/Renuka-3/Family_microbiome)
+[![License-Artistic_2.0-blue](https://img.shields.io/badge/License-Artistic_2.0-blue)
 
 <!-- badges: end -->
