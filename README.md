@@ -10,7 +10,7 @@ rmarkdown::render("fam_TSE.Rmd")
 ```
 ### Analysis scripts & visualisation
 Use the following  R scripts to perform the respective analysis.
-To run the analysis script use the following command  
+- To run the analysis script use the following command  
 ```
 rmarkdown::render("FILENAME.Rmd")
 ```
