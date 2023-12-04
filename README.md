@@ -1,7 +1,7 @@
 # Skin microbiota variation in Indian families
 ## The present study involves seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ##
 
-### Generate TSE object
+## Generate TSE object
 Create TSE object using metadata, otu table, and taxa table. 
 
 The data uses TreeSummarizedExperiment data container. 
@@ -11,7 +11,7 @@ To generate TSE object in RStudio run the script using the following command
 rmarkdown::render("fam_TSE.Rmd")
 ```
 
-### Analysis scripts & visualisation
+## Analysis scripts & visualisation
 Use the following scripts to perform the respective analysis.
 
 Run the analysis script in RStudio using the following command  
@@ -26,7 +26,7 @@ rmarkdown::render("FILENAME.Rmd")
 - [Inter-generational analysis](Intergeneration_analysis.Rmd) | [Figure 6](Intergeneration_analysis.md): within and between family comparison across three generations.
 - [supplementary](supplementary.Rmd) | [supplementary figure 1](supplementary.md): Family-wise inter-generational analysis.
 
-### Authors
+## Authors
 Renuka Potbhare, Ameeta Ravikumar, Eveliina Munukkac, Richa Ashmaa and Leo Lahti
 
 ### Preprint is available at
