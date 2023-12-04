@@ -14,7 +14,7 @@ Use the following scripts to perform the respective analysis
 - [Figure 4 /dbRDA](RDA.Rmd)
 - [Figure 5 /most prevalent microbiome](tse_core.Rmd): Location-wise relative abundances of the most prevalent phyla and genera in families.
 - [Figure 6 /Inter-generational analysis](Intergeneration_analysis.Rmd): within and between family comparison across three generations.
-- [supplementary figure 1](supplimentory.Rmd): Family-wise inter-generational analysis.
+- [supplementary figure 1](supplementary.Rmd): Family-wise inter-generational analysis.
 
  ### Results
  The generated results can be visualized here
