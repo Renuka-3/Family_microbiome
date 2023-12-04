@@ -3,6 +3,7 @@
 
 ### Generate TSE object
 Create TSE object using metadata, otu table, and taxa table. 
+
 The data uses TreeSummarizedExperiment data container. 
 To generate TSE object in RStudio run the script using the following command  
 ```
