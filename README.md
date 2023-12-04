@@ -34,6 +34,5 @@ Renuka Potbhare, Ameeta Ravikumar, Eveliina Munukkac, Richa Ashmaa and Leo Lahti
 ## Preprint is available at
 
 ## License
-This research work is licensed under the Artistic 2.0 license 
 
 [![License-Artistic_2.0-blue](https://img.shields.io/badge/License-Artistic_2.0-blue)
