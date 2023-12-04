@@ -5,13 +5,15 @@
 Create TSE object using metadata, otu table, and taxa table. 
 
 The data uses TreeSummarizedExperiment data container. 
+
 To generate TSE object in RStudio run the script using the following command  
 ```
 rmarkdown::render("fam_TSE.Rmd")
 ```
 ### Analysis scripts & visualisation
 Use the following  R scripts to perform the respective analysis.
-- To run the analysis script use the following command  
+
+To run the analysis script use the following command  
 ```
 rmarkdown::render("FILENAME.Rmd")
 ```
