@@ -2,15 +2,19 @@
 ## The present study involves seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ##
 
 ### Generate TSE object
-Create TSE object in RStudio using metadata, otu table, and taxa table. 
+Create TSE object using metadata, otu table, and taxa table. 
 The data uses TreeSummarizedExperiment data container. 
-To run the R script use the command- rmarkdown::render("fam_TSE.Rmd") 
-```bash
-fam_TSE.Rmd
+To generate TSE object in RStudio run the script using the following command  
+```
+rmarkdown::render("fam_TSE.Rmd")
 ```
 ### Analysis scripts & visualisation
 Use the following  R scripts to perform the respective analysis.
-To run the analysis script use the command-  rmarkdown::render("FILENAME.Rmd")
+To run the analysis script use the following command  
+```
+rmarkdown::render("FILENAME.Rmd")
+```
+
 - [Alpha diversity analysis](tse_alpha.Rmd) | [Figure 2](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors. 
 - [Beta diversity analysis](tse_beta.Rmd) | [Figure 3](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
 - [dbRDA](RDA.Rmd) | [Figure 4](RDA.md): distance-based Redundancy analysis is performed for confounding factors.
