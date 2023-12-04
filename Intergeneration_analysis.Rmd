@@ -16,7 +16,7 @@ library(dplyr)
 library(tidyverse)
 library(magrittr)
 
-tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+tse <- readRDS("data/fam_tse.rds")
 di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
 di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
 
@@ -95,7 +95,7 @@ library(dplyr)
 library(tidyverse)
 library(magrittr)
 
-tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+tse <- readRDS("data/fam_tse.rds")
 di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
 di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
 
@@ -172,7 +172,7 @@ library(dplyr)
 library(tidyverse)
 library(magrittr)
 
-tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+tse <- readRDS("data/fam_tse.rds")
 di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
 di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
 
@@ -255,7 +255,7 @@ library(dplyr)
 library(tidyverse)
 library(ggsignif)
 
-tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+tse <- readRDS("data/fam_tse.rds")
 di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
 di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
 
@@ -335,7 +335,7 @@ library(dplyr)
 library(tidyverse)
 library(ggsignif)
 
-tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+tse <- readRDS("data/fam_tse.rds")
 di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
 di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
 
@@ -423,7 +423,7 @@ library(dplyr)
 library(tidyverse)
 library(ggsignif)
 
-tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+tse <- readRDS("data/fam_tse.rds")
 di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
 di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
 

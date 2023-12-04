@@ -7,7 +7,7 @@ output: html_document
 
 ```{r alpha, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 library("mia")
-fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+fam_tse <- readRDS("data/fam_tse.rds")
 #Alpha diversity measures
 tse <- mia::estimateDiversity(fam_tse, 
                               assay_name = "counts",

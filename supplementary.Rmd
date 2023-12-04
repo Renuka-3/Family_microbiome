@@ -9,7 +9,7 @@ output: html_document
 
 ```{r g1g3, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 library("mia")
-fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+fam_tse <- readRDS("data/fam_tse.rds")
 #Alpha diversity measures
 tse <- mia::estimateDiversity(fam_tse, 
                               assay_name = "counts",
@@ -125,7 +125,7 @@ gridExtra::grid.arrange(A, F1, I, K, M, N, nrow = 2)
 
 ```{r g1g2, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 library("mia")
-fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+fam_tse <- readRDS("data/fam_tse.rds")
 #Alpha diversity measures
 tse <- mia::estimateDiversity(fam_tse, 
                               assay_name = "counts",

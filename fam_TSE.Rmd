@@ -12,18 +12,18 @@ library(mia)
 library(TreeSummarizedExperiment)
 
 # Read count data
-counts  <- read_excel("inputdata/processed/tables_new/OTU_table.xlsx") # Abundance table (e.g. ASV data; to assay data)
+counts  <- read_excel("data/OTU_table.xlsx") # Abundance table (e.g. ASV data; to assay data)
 row.names(counts) <- counts$OTUU 
 counts <- counts %>% select (-OTUU)
 counts <- as.matrix(counts) # Count data must be a matrix
 
 # Read taxonomic table
-tax <- as.data.frame(read_excel("inputdata/processed/tables_new/Taxa_table.xlsx"))   # Taxonomy table (to rowData)
+tax <- as.data.frame(read_excel("data/Taxa_table.xlsx"))   # Taxonomy table (to rowData)
 row.names(tax) <- tax$OTUU
 tax <- tax %>% select (-OTUU) 
 
 # Read sample metadata
-sampledata <- as.data.frame(read_excel("inputdata/processed/tables_new/Metadata.xlsx"))   # Sample data (to colData)
+sampledata <- as.data.frame(read_excel("data/Metadata.xlsx"))   # Sample data (to colData)
 row.names(sampledata) <- sampledata$Sample
 
 # Convert data into TreeSummarizedExperiment object
@@ -32,7 +32,7 @@ fam_tse1 <- TreeSummarizedExperiment(assays = SimpleList(counts=counts),
 				rowData = tax) 
 
 # Save the data object
-saveRDS(fam_tse1, file="inputdata/processed/TSE/fam_tse.rds")
-save(fam_tse1, file="inputdata/processed/TSE/fam_tse.rda")
+saveRDS(fam_tse1, file="data/fam_tse.rds")
+save(fam_tse1, file="data/fam_tse.rda")
 ```
 

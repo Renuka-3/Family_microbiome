@@ -12,7 +12,7 @@ library(knitr)
 library(stringr)
 
 # Load data
-fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+fam_tse <- readRDS("data/fam_tse.rds")
 #data(enterotype, package="mia")
 # Covariates that are being analyzed
 variable_names <- c("Location", "Diet", "Sex", "Age")

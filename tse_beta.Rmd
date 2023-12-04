@@ -17,7 +17,7 @@ library(vegan)
 ```
 
 ```{r b, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+fam_tse <- readRDS("data/fam_tse.rds")
 tse <- transformCounts(fam_tse, method = "relabundance")
 
 # Quantify dissimilarities in the original feature space
@@ -73,7 +73,7 @@ gridExtra::grid.arrange(p4, p, ncol = 2, widths=c(0.5, 0.5), heights = c(10, 4))
 
 ## PERMANOVA analysis
 #library("vegan")
-fam_tse <- readRDS("inputdata/processed/TSE/fam_tse.rds")
+fam_tse <- readRDS("data/fam_tse.rds")
 tse <- transformSamples(fam_tse, method = "relabundance")
 # Agglomerate data to Species level
 tse <- agglomerateByRank(tse, rank = "Genus")
