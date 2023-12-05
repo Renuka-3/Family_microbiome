@@ -5,8 +5,7 @@
 
 ## Dependencies & usage
  - The primary R packages are mia and miaViz
- 
- For installation visit [DOI: 10.18129/B9.bioc.mia](https://www.bioconductor.org/packages/release/bioc/html/mia.html) and DOI: 10.18129/B9.bioc.miaViz
+ For installation visit [DOI: 10.18129/B9.bioc.mia](https://www.bioconductor.org/packages/release/bioc/html/mia.html) and [DOI: 10.18129/B9.bioc.miaViz](https://www.bioconductor.org/packages/release/bioc/html/miaViz.html)
  - 
 
 ## Generate TSE object
