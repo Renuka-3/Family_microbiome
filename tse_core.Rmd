@@ -88,3 +88,64 @@ hm <- Heatmap(sub_assay,
 print(hm)
 ```
 
+
+## Most prevelent genera
+
+```{r core_genera, echo=FALSE, message=FALSE}
+library(knitr)
+library(tidyverse)
+library(miaViz)
+
+tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate data
+altExps(tse) <- splitByRanks(tse)
+
+# Relative transform
+altExp(tse, "Genus") <- transformSamples(altExp(tse, "Genus"), method = "relabundance")
+
+# Calculate mean
+rowData(altExp(tse, "Genus"))[["mean"]] <- rowData(altExp(tse, "Genus"))[["mean"]] <- rowMeans(assay(altExp(tse, "Genus"), "relabundance"))
+#rowData(altExp(tse, "Genus"))[["mean"]] <- round(100 *(rowMeans(assay(altExp(tse, "Genus"), "relabundance"),1))
+
+# Calculate median
+rowData(altExp(tse, "Genus"))[["median"]] <- rowMedians(assay(altExp(tse, "Genus"), "relabundance"))
+
+# Get table,, order features based on median value, take only top 6
+df <- rowData(altExp(tse, "Genus"))
+df <- df[ order(df[["median"]], decreasing = TRUE), ]
+df[1:6, ]
+
+head(getPrevalence(fam_tse, rank = "Genus", detection = 0.1/100, sort = TRUE,
+                   assay.type = "counts", as_relative = TRUE))
+```
+
+## Most prevelent phyla
+
+```{r core_phyla, echo=FALSE, message=FALSE}
+
+tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate data
+altExps(tse) <- splitByRanks(tse)
+
+# Relative transform
+altExp(tse, "Phylum") <- transformSamples(altExp(tse, "Phylum"), method = "relabundance")
+
+# Calculate mean
+rowData(altExp(tse, "Phylum"))[["mean"]] <- rowData(altExp(tse, "Phylum"))[["mean"]] <- rowMeans(assay(altExp(tse, "Phylum"), "relabundance"))
+
+
+# Calculate median
+rowData(altExp(tse, "Phylum"))[["median"]] <- rowMedians(assay(altExp(tse, "Phylum"), "relabundance"))
+
+# Get table,, order features based on median value, take only top 3
+df <- rowData(altExp(tse, "Phylum"))
+df <- df[ order(df[["median"]], decreasing = TRUE), ]
+df[1:3, ]
+
+
+head(getPrevalence(fam_tse, rank = "Phylum", detection = 0.1/100, sort = TRUE,
+                   assay.type = "counts", as_relative = TRUE))
+```
+

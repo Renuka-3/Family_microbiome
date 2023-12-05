@@ -108,8 +108,8 @@ library(data.table)
 df <- tibble::tribble(
   ~Phylum,       ~Mean,    ~Median ,   ~Prevalence,
   "Firmicutes",     73.0,      93.5,           100,  
-  "Proteobacteria", 23.8,       2.6,         58.3, 
-  "Actinobacteria", 3.2,       1.2,         59.7
+  "Proteobacteria", 23.8,       2.6,         97.2, 
+  "Actinobacteria", 3.2,       1.2,         90.2
  )
 # Set universal border color as black; otherwise it will will be dark grey.
 set_flextable_defaults(border.color = "black")
