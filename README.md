@@ -9,12 +9,12 @@
 3. Create TSE object
 4. Run the analysis scripts and see the output
 
-## Dependencies & Installation
+## 2. Dependencies & Installation
  - The primary R packages are mia and miaViz;
  For installation visit [DOI: 10.18129/B9.bioc.mia](https://www.bioconductor.org/packages/release/bioc/html/mia.html) and [DOI: 10.18129/B9.bioc.miaViz](https://www.bioconductor.org/packages/release/bioc/html/miaViz.html)
- - 
 
-## Generate TSE object
+
+## 3. Generate TSE object
 Create TSE object using metadata, otu table, and taxa table. 
 
 The data uses TreeSummarizedExperiment data container. 
@@ -24,7 +24,7 @@ To generate TSE object in RStudio run the script using the following command
 rmarkdown::render("fam_TSE.Rmd")
 ```
  
-## Analysis scripts & visualisation
+## 4. Analysis scripts & visualisation
 Use the following scripts to perform the respective analysis in RStudio using the following command  
 ```
 rmarkdown::render("FILENAME.Rmd", output_format="md_document")
