@@ -7,7 +7,7 @@
 * [Usage](#1.Usage)
 * [Dependencies & Installation](#2.-Dependencies-&-Installation)
 * [3.Generate TSE object](#3.-Generate-TSE-object)
-* [Analysis scripts & visualization](#Analysis-scripts-&-visualization)
+* [Analysis scripts & visualization](#analysis-scripts-&-visualization)
 * [4. Analysis scripts & visualization](#-4.-Analysis-scripts-&-visualization)
 * [Authors](#Authors)
 * [Preprint](#DOI)
