@@ -1,5 +1,7 @@
 [![License-Artistic_2.0-blue](https://img.shields.io/badge/License-Artistic_2.0-blue)
 
+![License-Artistic_2.0-blue](https://img.shields.io/badge/License-Artistic_2.0-blue)
+
 # Skin microbiota variation in Indian families
 ### The present study involves seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ###
 
