@@ -4,10 +4,9 @@
 ### The present study involves seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ###
 
 ## Contents
-* [Usage](#1.usage)
 * [Usage](#usage)
-* [Dependencies & Installation](#2.-Dependencies-&-Installation)
-* [3.Generate TSE object](#3.-Generate-TSE-object)
+* [Dependencies & Installation](#dependencies-&-installation)
+* [Generate TSE object](#generate-tse-object)
 * [Analysis scripts & visualization](#analysis-scripts-&-visualization)
 * [4. Analysis scripts & visualization](#-4.-Analysis-scripts-&-visualization)
 * [Authors](#Authors)
@@ -21,12 +20,12 @@
 3. Create TSE object
 4. Run the analysis scripts and see the output
 
-## 2. Dependencies & Installation
+## Dependencies & Installation
 The primary R packages are mia and miaViz;
  For installation visit [DOI: 10.18129/B9.bioc.mia](https://www.bioconductor.org/packages/release/bioc/html/mia.html) and [DOI: 10.18129/B9.bioc.miaViz](https://www.bioconductor.org/packages/release/bioc/html/miaViz.html)
 
 
-## 3. Generate TSE object
+## Generate TSE object
 Create TSE object using metadata, otu table, and taxa table. 
 
 The data uses TreeSummarizedExperiment data container. 
