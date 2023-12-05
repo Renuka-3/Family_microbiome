@@ -32,7 +32,7 @@ rmarkdown::render("FILENAME.Rmd", output_format="md_document")
 - [supplementary](supplementary.Rmd) | [supplementary figure 1](supplementary.md): Family-wise inter-generational analysis.
 
 ## Authors
-Renuka Potbhare, Ameeta Ravikumar, Eveliina Munukkac, Richa Ashmaa and Leo Lahti
+Renuka Potbhare, Ameeta Ravikumar, Eveliina Munukka, Richa Ashmaa and Leo Lahti
 
 ## Preprint is available at
 
