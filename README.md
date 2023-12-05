@@ -4,10 +4,10 @@
 ### The present study involves seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ###
 
 #### Contents
-* [Usage](#1. Usage)
-* [Dependencies & Installation](#2. Dependencies & Installation)
-* [Generate TSE object](#3. Generate TSE object)
-* [Analysis scripts & visualization](#4. Analysis scripts & visualization)
+* [Usage](#1.Usage)
+* [Dependencies & Installation](#2.Dependencies & Installation)
+* [Generate TSE object](#3.Generate TSE object)
+* [Analysis scripts & visualization](#Analysis scripts & visualization)
 * [Authors](#Authors)
 * [Usage](#usage)
 * [Preprint](#Preprint available at)
