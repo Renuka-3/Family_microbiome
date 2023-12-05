@@ -5,10 +5,9 @@
 
 ## Contents
 * [Usage](#usage)
-* [Dependencies & Installation](#dependencies-&-installation)
+* [Dependencies & Installation](#dependencies-and-installation)
 * [Generate TSE object](#generate-tse-object)
-* [Analysis scripts & visualization](#analysis-scripts-&-visualization)
-* [4. Analysis scripts & visualization](#-4.-Analysis-scripts-&-visualization)
+* [Analysis scripts & visualization](#analysis-scripts-and-visualization)
 * [Authors](#Authors)
 * [Preprint](#DOI)
 * [License](#License)
@@ -20,7 +19,7 @@
 3. Create TSE object
 4. Run the analysis scripts and see the output
 
-## Dependencies & Installation
+## Dependencies and Installation
 The primary R packages are mia and miaViz;
  For installation visit [DOI: 10.18129/B9.bioc.mia](https://www.bioconductor.org/packages/release/bioc/html/mia.html) and [DOI: 10.18129/B9.bioc.miaViz](https://www.bioconductor.org/packages/release/bioc/html/miaViz.html)
 
@@ -35,7 +34,7 @@ To generate TSE object in RStudio run the script using the following command
 rmarkdown::render("fam_TSE.Rmd")
 ```
  
-## Analysis scripts & visualization
+## Analysis scripts and visualization
 Use the following scripts to perform the respective analysis in RStudio. 
 
 Use the following command to reproduce the analysis and generate the output file
