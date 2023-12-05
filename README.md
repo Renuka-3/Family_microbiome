@@ -6,8 +6,8 @@
 ## Contents
 * [Usage](#1.Usage)
 * [Dependencies & Installation](#2.-Dependencies-&-Installation)
-* [3.Generate TSE object](#-3.Generate-TSE-object)
-* [4. Analysis scripts & visualization](## 4. Analysis scripts & visualization)
+* [3.Generate TSE object](#3.-Generate-TSE-object)
+* [Analysis scripts & visualization](#Analysis-scripts-&-visualization)
 * [4. Analysis scripts & visualization](#-4.-Analysis-scripts-&-visualization)
 * [Authors](#Authors)
 * [Preprint](#DOI)
@@ -35,7 +35,7 @@ To generate TSE object in RStudio run the script using the following command
 rmarkdown::render("fam_TSE.Rmd")
 ```
  
-## 4. Analysis scripts & visualization
+## Analysis scripts & visualization
 Use the following scripts to perform the respective analysis in RStudio. 
 
 Use the following command to reproduce the analysis and generate the output file
