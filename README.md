@@ -15,8 +15,8 @@
 
 
 ## 1. Usage
-1. Open RStudio to reproduce the research work
-2. Install the primary packages
+1. Use RStudio to reproduce the research work
+2. Install the primary R packages
 3. Create TSE object
 4. Run the analysis scripts and see the output
 
