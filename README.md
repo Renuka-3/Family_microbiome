@@ -3,10 +3,11 @@
 # Skin microbiota variation in Indian families
 ### The present study involves seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ###
 
-## Dependencies
- The primary R packages are mia and miaViz
+## Dependencies & usage
+ - The primary R packages are mia and miaViz
  
- For installation visit DOI: 10.18129/B9.bioc.mia and DOI: 10.18129/B9.bioc.miaViz
+ For installation visit [DOI: 10.18129/B9.bioc.mia](https://www.bioconductor.org/packages/release/bioc/html/mia.html) and DOI: 10.18129/B9.bioc.miaViz
+ - 
 
 ## Generate TSE object
 Create TSE object using metadata, otu table, and taxa table. 
