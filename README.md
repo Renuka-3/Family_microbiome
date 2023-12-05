@@ -1,5 +1,3 @@
-[![License-Artistic_2.0-blue](https://img.shields.io/badge/License-Artistic_2.0-blue)
-
 ![License-Artistic_2.0-blue](https://img.shields.io/badge/License-Artistic_2.0-blue)
 
 # Skin microbiota variation in Indian families
