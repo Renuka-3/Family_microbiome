@@ -37,7 +37,7 @@ rmarkdown::render("fam_TSE.Rmd")
 ## Analysis scripts and visualization
 Use the following scripts to perform the respective analysis in RStudio. 
 
-Use the following command to reproduce the analysis and generate the output file
+Use the following command to reproduce the analysis and generate the output file as a .md document 
 ```
 rmarkdown::render("FILENAME.Rmd", output_format="md_document")
 ```
