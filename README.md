@@ -15,7 +15,7 @@
 * [License](#License)
 
 
-## 1. Usage
+## Usage
 1. Use RStudio to reproduce the research work
 2. Install the primary R packages
 3. Create TSE object
