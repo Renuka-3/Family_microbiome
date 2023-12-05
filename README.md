@@ -6,7 +6,7 @@
 ## Contents
 * [Usage](#1.Usage)
 * [Dependencies & Installation](#2.Dependencies_&_Installation)
-* [3.Generate TSE object](#Generate_TSE_object)
+* [3.Generate TSE object](#3._Generate_TSE_object)
 * [4. Analysis scripts & visualization](#4.Analysis_scripts_&_visualization)
 * [Authors](#Authors)
 * [Usage](#usage)
