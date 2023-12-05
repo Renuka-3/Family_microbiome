@@ -6,7 +6,7 @@
 ## Contents
 * [Usage](#1.Usage)
 * [Dependencies & Installation](#2.Dependencies_&_Installation)
-* [Generate TSE object](#3.Generate_TSE_object)
+* [3.Generate TSE object](#Generate_TSE_object)
 * [Analysis scripts & visualization](#4.Analysis_scripts_&_visualization)
 * [Authors](#Authors)
 * [Usage](#usage)
@@ -25,7 +25,7 @@ The primary R packages are mia and miaViz;
  For installation visit [DOI: 10.18129/B9.bioc.mia](https://www.bioconductor.org/packages/release/bioc/html/mia.html) and [DOI: 10.18129/B9.bioc.miaViz](https://www.bioconductor.org/packages/release/bioc/html/miaViz.html)
 
 
-## 3. Generate TSE object
+## Generate TSE object
 Create TSE object using metadata, otu table, and taxa table. 
 
 The data uses TreeSummarizedExperiment data container. 
