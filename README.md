@@ -3,6 +3,11 @@
 # Skin microbiota variation in Indian families
 ### The present study involves seventy-two individuals from fifteen families in two geographical regions of Maharashtra, India. This study underscores the diversity and commonalities in skin microbiota composition within and between families. ###
 
+## Dependencies
+ The primary R packages are mia and miaViz
+ 
+ For installation visit DOI: 10.18129/B9.bioc.mia and DOI: 10.18129/B9.bioc.miaViz
+
 ## Generate TSE object
 Create TSE object using metadata, otu table, and taxa table. 
 
@@ -12,15 +17,11 @@ To generate TSE object in RStudio run the script using the following command
 ```
 rmarkdown::render("fam_TSE.Rmd")
 ```
-## Dependencies
- The primary R packages are mia and miaViz
- 
- For installation visit DOI: 10.18129/B9.bioc.mia and DOI: 10.18129/B9.bioc.miaViz
  
 ## Analysis scripts & visualisation
 Use the following scripts to perform the respective analysis in RStudio using the following command  
 ```
-rmarkdown::render("FILENAME.Rmd")
+rmarkdown::render("FILENAME.Rmd", output_format="md_document")
 ```
 
 - [Alpha diversity analysis](tse_alpha.Rmd) | [Figure 2](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors. 
