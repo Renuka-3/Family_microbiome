@@ -12,15 +12,6 @@
 * [Preprint](#DOI)
 * [License](#License)
 
-## Contents
-1. [Usage](#usage)
-2. [Dependencies & Installation](#dependencies-and-installation)
-3. [Generate TSE object](#generate-tse-object)
-4. [Analysis scripts & visualization](#analysis-scripts-and-visualization)
-5. [Authors](#Authors)
-6. [Preprint](#DOI)
-7. [License](#License)
-
 ## Usage
 1. Use RStudio to reproduce the research work
 2. Install the primary R packages
