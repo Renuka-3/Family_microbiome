@@ -16,7 +16,7 @@
 1. Use RStudio to reproduce the research work
 2. Install the primary R packages
 3. Create TSE object
-4. Run the analysis scripts and see the output
+4. Run the analysis scripts in RStudio and see the output
 
 ## Dependencies and Installation
 The primary R packages are mia and miaViz;
@@ -34,9 +34,8 @@ rmarkdown::render("fam_TSE.Rmd")
 ```
  
 ## Analysis scripts and visualization
-Use the following scripts to perform the respective analysis in RStudio. 
+To start running the respective analysis first create the TSE object and then use the following command to reproduce the analysis and generate the output file as a .md document 
 
-Use the following command to reproduce the analysis and generate the output file as a .md document 
 ```
 rmarkdown::render("FILENAME.Rmd", output_format="md_document")
 ```
