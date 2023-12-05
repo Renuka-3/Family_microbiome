@@ -10,7 +10,7 @@
 * [Analysis scripts & visualization](#4.Analysis_scripts_&_visualization)
 * [Authors](#Authors)
 * [Usage](#usage)
-* [Preprint](#Preprint available at)
+* [Preprint](#DOI)
 * [License](#License)
 
 
