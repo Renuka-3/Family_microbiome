@@ -235,14 +235,6 @@ c <- ggplot(mergedcities2, aes(x=grp2,y=value2))+
     #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + 
   labs(x = "", y= "Bray-Curtis index", title = "C. G1-G3 comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
 #print(c) 
-
-## Multiple pairwise comparison 
-#m <- c()
-#l <- cbind(mergedcities, mergedcities1, mergedcities2)
-#m[["grp"]] <- kruskal.test(data = l, value ~ factor(grp))$p.value
-#m[["grp1"]] <- kruskal.test(data = l, value1 ~ factor(grp1))$p.value
-#m[["grp2"]] <- kruskal.test(data = l, value2 ~ factor(grp2))$p.value
-#p.adjust(m, method="fdr")
 ```
 
 # Father-child location-wise
@@ -403,13 +395,6 @@ L <- ggplot(mergedcities4, aes(x=grp4,y=value4))+
     #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + 
   theme(text = element_text(size = 10)) + labs(x = "", y= "Bray-Curtis index", title = "E. Mother-child comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
 #print(L)
-
-## Multiple pairwise comparison 
-#m <- c()
-#l <- cbind(mergedcities3, mergedcities4)
-#m[["grp3"]] <- kruskal.test(data = l, value3 ~ factor(grp3))$p.value
-#m[["grp4"]] <- kruskal.test(data = l, value4 ~ factor(grp4))$p.value
-#p.adjust(m, method="fdr")
 ```
 
 
