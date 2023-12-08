@@ -54,3 +54,6 @@ Renuka Potbhare, Ameeta Ravikumar, Eveliina Munukka, Richa Ashma and Leo Lahti
 
 ## License
 This research work is licensed under the Artistic 2.0 License. See LICENSE.txt for more information.
+
+## Cite the code
+[![DOI](https://zenodo.org/badge/372873715.svg)](https://zenodo.org/doi/10.5281/zenodo.10297062)
