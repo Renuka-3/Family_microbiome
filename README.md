@@ -11,6 +11,7 @@
 * [Authors](#Authors)
 * [Preprint](#DOI)
 * [License](#License)
+* [Cite the code](#cite-the-code)
 
 ## Usage
 1. Use RStudio to reproduce the research work
