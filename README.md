@@ -52,7 +52,7 @@ rmarkdown::render("FILENAME.Rmd", output_format="md_document")
 Renuka Potbhare, Ameeta Ravikumar, Eveliina Munukka, Richa Ashma and Leo Lahti
 
 ## Preprint is available at
-[![DOI](https://doi.org/10.1101/2023.12.09.570904)] 
+[DOI](https://doi.org/10.1101/2023.12.09.570904) 
 
 ## License
 This research work is licensed under the Artistic 2.0 License. See LICENSE.txt for more information.
