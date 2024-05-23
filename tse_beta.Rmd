@@ -49,30 +49,35 @@ tse <- transformSamples(tse, method = "relabundance")
 tse <- runMDS(tse, FUN = vegan::vegdist, method = "bray", name = "PCoA_BC", exprs_values = "relabundance")
 
 # Create ggplot object for location 
-p <- plotReducedDim(tse, "PCoA_BC", colour_by = "Location", point_size= 2.5)
+p <- plotReducedDim(tse, "PCoA_BC", colour_by = "Location", point_size= 3, shape_by = "G")
+#p <- plotReducedDim(tse, "PCoA_BC", colour_by = "Family")
 # Add explained variance for each axis
 e <- attr(reducedDim(tse, "PCoA_BC"), "eig");
 rel_eig <- e/sum(e[e>0])          
 p <- p + labs(x = paste("PCoA 1 (", round(100 * rel_eig[[1]],1), "%", ")", sep = ""),
               y = paste("PCoA 2 (", round(100 * rel_eig[[2]],1), "%", ")", sep = ""), title= "B. Location") + 
-   theme(legend.position = 'none', legend.text=element_text(size=9)) + theme(axis.text.x = element_text(size=8), axis.text.y = element_text(size = 8)) + theme(axis.title = element_text(size = 10), plot.title = element_text(size = 15))
-#print(p)
+   theme(legend.text=element_text(size=15)) + theme(axis.text.x = element_text(size=15), axis.text.y = element_text(size = 15)) + theme(axis.title = element_text(size = 15), plot.title = element_text(size = 20))
+p1 <- p + scale_fill_manual(values=c(Pune = "#0072B2", Ahmednagar = "#D55E00"), aesthetics="colour") + labs(color= "Location", shape_by= "Generation") + theme(legend.title = element_text(size=13), legend.text = element_text(size = 10))
+
 
 
 # Create ggplot object for Family
-p4 <- plotReducedDim(tse, "PCoA_BC", colour_by = "Family", point_size= 2.5)
+p4 <- plotReducedDim(tse, "PCoA_BC", colour_by = "Family", point_size= 3, shape_by = "G") 
 e <- attr(reducedDim(tse, "PCoA_BC"), "eig");
 rel_eig <- e/sum(e[e>0])          
 p4 <- p4 + labs(x = paste("PCoA 1 (", round(100 * rel_eig[[1]],1), "%", ")", sep = ""),
-              y = paste("PCoA 2 (", round(100 * rel_eig[[2]],1), "%", ")", sep = ""), title= "A. Family") + theme(legend.position = 'none', legend.text=element_text(size=5)) + theme(axis.text.x = element_text(size=8), axis.text.y = element_text(size = 8)) + theme(axis.title = element_text(size = 10), plot.title = element_text(size = 15)) + theme(legend.box.spacing = unit(5, "pt"), legend.margin=margin(10,10,10,10)) #+labs(tag = "A")
+              y = paste("PCoA 2 (", round(100 * rel_eig[[2]],1), "%", ")", sep = ""), title= "A. Family") +
+ theme(legend.text=element_text(size=15)) + labs(colour = "Family", shape = "Generation") + theme(axis.text.x = element_text(size=15), axis.text.y = element_text(size = 15)) + theme(axis.title = element_text(size = 15), plot.title = element_text(size = 20)) + theme(legend.box.spacing = unit(5, "pt"), legend.margin=margin(0,0,0,0),legend.title = element_text(size=12), legend.text = element_text(size = 10)) 
+
+p5 <- p4 + scale_fill_manual(values=c(A = "black", B = "#E7B800", C = "royalblue4", D = "darkcyan", E = "grey", F ="red", G="green", H= "sandybrown", I = "yellow", J = "purple", K= "brown", L = "magenta2", M ="salmon2", N= "olivedrab4", O= "sienna"), aesthetics="colour")  + labs(colour = "Family", shape = "Generation")          
 
 library(gridExtra)
 library(ggpubr)
-gridExtra::grid.arrange(p4, p, ncol = 2, widths=c(0.5, 0.5), heights = c(10, 4))
+gridExtra::grid.arrange(p5, p1, ncol = 2, widths=c(0.5, 0.5), heights = c(10, 4))
 
 
 ## PERMANOVA analysis
-#library("vegan")
+library("vegan")
 fam_tse <- readRDS("data/fam_tse.rds")
 tse <- transformSamples(fam_tse, method = "relabundance")
 # Agglomerate data to Species level
@@ -90,10 +95,11 @@ temp <- anova(
 set.seed(1576)
 
 # We choose 999 random permutations
-permanova <- adonis2(t(assay(tse,"relabundance")) ~ Location + Diet + Age + Family + Sex,
+permanova <- adonis2(t(assay(tse,"relabundance")) ~  Diet + Age + Family + Sex + Location,
                      by = "margin", 
                      data = colData(tse),
                      method = "bray",
                      permutations = 999)
 head(permanova)
 ```
+

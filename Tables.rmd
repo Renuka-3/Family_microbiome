@@ -9,7 +9,10 @@ output: html_document
 
 ```{r table1, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
 library(pacman)
-p_load(flextable, dplyr, officer)
+library(flextable)
+library(dplyr)
+library(officer)
+#p_load(flextable, dplyr, officer)
 library(data.table)
 
 df <- tibble::tribble(
@@ -68,16 +71,15 @@ ft
 
 ```{r tab, echo=FALSE, error=FALSE, message=FALSE}
 library(pacman)
-p_load(flextable, dplyr, officer)
 library(data.table)
 
 df <- tibble::tribble(
   ~Factors,  	~R2,       	~p,
-  "Diet",    	0.00,     	0.93,   
-  "Age", 	    0.02,     	0.36,  
-  "Sex",  	0.00,	      0.61,
-  "Location",	0.19,     	0.07,
-  "Family", 	0.29,     	0.00
+  "Diet",    	0.002,     	0.923,   
+  "Age", 	    0.020,     	0.317,  
+  "Sex",  	0.008,	      0.467,
+  "Location",	0.000,     	0.001,
+  "Family", 	0.278,     	0.001
  )
 
 # Set universal border color as black; otherwise it will will be dark grey.
@@ -102,14 +104,13 @@ ft7
 
 ```{r ta, echo=FALSE, error=FALSE, message=FALSE}
 library(pacman)
-p_load(flextable, dplyr, officer)
 library(data.table)
 
 df <- tibble::tribble(
-  ~Phylum,       ~Mean,    ~Median ,   ~Prevalence,
-  "Firmicutes",     73.0,      93.5,           100,  
-  "Proteobacteria", 23.8,       2.6,         97.2, 
-  "Actinobacteria", 3.2,       1.2,         90.2
+  ~Phylum,       ~Mean,    ~Median ,   ~Prevalence,   ~IQR,
+  "Firmicutes",     73.0,      93.5,           100,  53.9,
+  "Proteobacteria", 23.8,       2.6,         97.2,  49.3,
+  "Actinobacteria", 3.2,       1.2,         90.2,   2.42
  )
 # Set universal border color as black; otherwise it will will be dark grey.
 set_flextable_defaults(border.color = "black")
@@ -120,7 +121,8 @@ ft <- flextable(df)
 ftt <- set_header_labels(ft, values = c( Phylum = "Phylum",
      Mean = "Mean relative abundance (%)",
      Median = "Median (%)",
-     Prevalence = "Prevalence (%)"))
+     Prevalence = "Prevalence (%)",
+     IQR = "Inter quartile range"))
 ft_1 <- theme_booktabs(ftt, bold_header = TRUE)
 ft_1 <- align(ft_1, i = NULL, j = NULL, align = "center", part = "all")
 ft_2 <- italic(ft_1, i = NULL, j = "Phylum", italic = TRUE, part = "body")
@@ -133,17 +135,16 @@ ft_4
 
 ```{r table4, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
 library(pacman)
-p_load(flextable, dplyr, officer)
 library(data.table)
 
 da <- tibble::tribble(
-  ~Genus,       ~Mean,    ~Median ,   ~Prevalence,
-  "Staphylococcus",     50.9,   	60.2,	      100,       
-  "Bacillus",     	16.3,     	0.3,        	87.5,  
-  "Pseudomonas",   	9.2,     	0.1,          	61.1,
-  "Anaerococcus", 	1.7,   	0.0,          	38.9,
-  "Corynebacterium", 	1.0,	0.2,	          73.6,
-  "Dermabacter",     	0.4,   	0.0,     	40.2
+  ~Genus,       ~Mean,    ~Median ,   ~Prevalence,  ~IQR, 
+  "Staphylococcus",     50.9,   	60.2,	      100,   91.8,    
+  "Bacillus",     	16.3,     	0.3,        	87.5,  12.9,
+  "Pseudomonas",   	9.2,     	0.1,          	61.1,  4.98,
+  "Anaerococcus", 	1.7,   	0.0,          	38.9,    0.26,
+  "Corynebacterium", 	1.0,	0.2,	          73.6,    0.91,
+  "Dermabacter",     	0.4,   	0.0,     	40.2,         0.61
  )
 # Set universal border color as black; otherwise it will will be dark grey.
 set_flextable_defaults(border.color = "black")
@@ -154,10 +155,210 @@ ta <- flextable(da)
 taa <- set_header_labels(ta, values = c( Genus = "Genus",
      Mean = "Mean relative abundance (%)", 
      Median = "Median (%)",
-     Prevalence = "Prevalence (%)"))
+     Prevalence = "Prevalence (%)",
+     IQR = "Inter quartile range (%)"))
 
 ft_1 <- theme_booktabs(taa, bold_header = TRUE)
 ft_1 <- align(ft_1, i = NULL, j = NULL, align = "center", part = "all")
 ft_2 <- italic(ft_1, i = NULL, j = "Genus", italic = TRUE, part = "body")
 ft_2
+```
+
+
+##Supplementary table 1
+
+```{r tab, echo=FALSE, error=FALSE, message=FALSE}
+library(pacman)
+p_load(flextable, dplyr, officer)
+library(data.table)
+
+df <- tibble::tribble(
+   ~Genus,             ~Family,      	~p,
+   "Staphylococcus",   "A-C",    	 0.07,     	 
+  "Staphylococcus",    "C-E", 	     0.01,     	
+  "Staphylococcus",     "E-F",  	  0.02,	      
+  "Staphylococcus",     "A-N",	    0.08,     	
+  "Staphylococcus",     "E-N",     0.01,
+  "Bacillus",          "E-H",     0.04
+ )
+
+# Set universal border color as black; otherwise it will will be dark grey.
+set_flextable_defaults(border.color = "black")
+
+# Create a flextable based on the dataset above
+ft <- flextable(df)
+
+ftt <- set_header_labels(ft, values = c( Genus = "Genus", 
+                                         Family = "Family comparison",
+                                          p = "p-value"))
+ft_1 <- theme_booktabs(ftt, bold_header = TRUE)
+#ft_1 <- align(ft_1, i = 1, j = NULL, align = "center", part = "all")
+ft5 <- add_footer_lines(ft_1, "Note- The p-value indicates level of significance <0.001∗∗∗, <0.01∗∗, <0.05∗, 0.1 ns")
+ft6 <- set_table_properties(ft5, width = 0.5, layout = "autofit")
+ft6 <- align(ft6, part = "all", i = NULL, j = NULL, align = "center")
+ft7 <- fontsize(ft6, i = NULL, j = NULL, size = 11, part = "footer")
+ft7
+ft_8 <- italic(ft7, i = NULL, j = "Genus", italic = TRUE, part = "body")
+```
+
+
+
+##Updated Supplementary table 1 with 1/100 DAA for family
+
+```{r tab, echo=FALSE, error=FALSE, message=FALSE}
+library(pacman)
+p_load(flextable, dplyr, officer)
+library(data.table)
+
+df <- tibble::tribble(
+   ~Genus,             ~Family,      	~p,
+   "Bacillus",          "A-C",     0.02,
+   "Bacillus",          "C-E",     0.01,
+   "Bacillus",          "A-F",     0.01,
+   "Bacillus",          "E-F",     0.01,
+   "Bacillus",          "E-I",     0.02,
+   "Bacillus",          "C-K",     0.01,
+   "Bacillus",          "F-K",     0.02,
+   "Bacillus",          "A-L",     0.04,
+   "Bacillus",          "E-L",     0.01,
+   "Bacillus",          "A-N",     0.01,
+   "Bacillus",          "E-N",     0.00,
+   "Bacillus",          "K-N",     0.01,
+   "Bacillus",          "E-O",     0.01,
+   "Staphylococcus",   "B-H",    	 0.05,     	 
+  "Staphylococcus",    "D-H", 	   0.04,     	
+  "Staphylococcus",     "E-H",  	 0.02,	      
+  "Staphylococcus",     "E-I",	   0.05,     	
+  "Anaerococcus",      "B-C",     0.05,
+   "Anaerococcus",      "B-D",    0.01, 
+   "Anaerococcus",      "B-E",    0.01,
+   "Anaerococcus",      "B-F",    0.02,
+   "Anaerococcus",      "B-H",    0.02,
+   "Anaerococcus",      "E-L",    0.05,
+   "Anaerococcus",      "D-M",    0.02,
+   "Anaerococcus",      "E-M",    0.03,
+   "Anaerococcus",      "F-M",    0.05,
+  "klebsiella",         "A-B",    0.05
+ )
+
+# Set universal border color as black; otherwise it will will be dark grey.
+set_flextable_defaults(border.color = "black")
+
+# Create a flextable based on the dataset above
+ft <- flextable(df)
+
+ftt <- set_header_labels(ft, values = c( Genus = "Genus", 
+                                         Family = "Family comparison",
+                                          p = "p-value"))
+ft_1 <- theme_booktabs(ftt, bold_header = TRUE)
+#ft_1 <- align(ft_1, i = 1, j = NULL, align = "center", part = "all")
+ft5 <- add_footer_lines(ft_1, "Note- The p-value indicates level of significance <0.001∗∗∗, <0.01∗∗, <0.05∗, 0.1 ns")
+ft6 <- set_table_properties(ft5, width = 0.5, layout = "autofit")
+ft6 <- align(ft6, part = "all", i = NULL, j = NULL, align = "center")
+ft7 <- fontsize(ft6, i = NULL, j = NULL, size = 11, part = "footer")
+ft7
+ft_8 <- italic(ft7, i = NULL, j = "Genus", italic = TRUE, part = "body")
+```
+
+
+
+##Updated Supplementary table 2 with 1/100 DAA for LOctaion
+
+```{r tab, echo=FALSE, error=FALSE, message=FALSE}
+library(pacman)
+p_load(flextable, dplyr, officer)
+library(data.table)
+
+df <- tibble::tribble(
+   ~Genus,             ~chi,      	~df,      ~p,
+   "Staphylococcus",    19.81,     1,        0.00,
+   "Xanthomonas",       3.76,      1,        0.05,
+   "Jeotgalibacillus",  8.69,      1,        0.00,
+   "Amycolatopsis",     7.44,      1,        0.00,
+   "Komagataeibacter",  7.69,      1,        0.00,
+   "Novispirillum",     6.3,      1,         0.01,
+   "Tuberibacillus",    4.14,   1,           0.04,
+   "Nesterenkonia",     9.45,     1,         0.00,
+   "Terribacillus",     8.98,    1,          0.00,
+   "Sporosarcina",      12.06,   1,          0.00,
+   "Lentibacillus",      5.27,    1,         0.02,
+   "Geothrix",          10.2,    1,          0.00,
+   "Dietzia",          6.62,    1,          0.01,
+   "Planococcus",   15.72,        1,        0.00,
+  "Gracilibacillus",    9.39,     1,        0.00,
+  "Geobacillus",     9.34,        1,        0.00,
+  "Ornithinibacillus", 25.06,     1,        0.00,
+  "Oceanobacillus",      15.45,   1,        0.00,
+   "Domibacillus",      3.96,     1,        0.04,
+   "Paracoccus",      15.80,      1,        0.00,
+   "Paenibacillus",      20.82,   1,        0.00,
+   "Virgibacillus",      23.29,   1,        0.00,
+   "Brachybacterium",   6.88,     1,        0.00,
+   "Stenotrophomonas",  6.77,    1,        0.00
+    )
+
+# Set universal border color as black; otherwise it will will be dark grey.
+set_flextable_defaults(border.color = "black")
+
+# Create a flextable based on the dataset above
+ft <- flextable(df)
+
+ftt <- set_header_labels(ft, values = c( Genus = "Genus", 
+                                         chi = "chi square",
+                                         df = "df",
+                                          p = "p-value"))
+ft_1 <- theme_booktabs(ftt, bold_header = TRUE)
+#ft_1 <- align(ft_1, i = 1, j = NULL, align = "center", part = "all")
+ft5 <- add_footer_lines(ft_1, "Note- The p-value indicates level of significance <0.001∗∗∗, <0.01∗∗, <0.05∗, 0.1 ns")
+ft6 <- set_table_properties(ft5, width = 0.5, layout = "autofit")
+ft6 <- align(ft6, part = "all", i = NULL, j = NULL, align = "center")
+ft7 <- fontsize(ft6, i = NULL, j = NULL, size = 11, part = "footer")
+ft7
+ft_8 <- italic(ft7, i = NULL, j = "Genus", italic = TRUE, part = "body")
+```
+
+##Updated with Dr Richa_ Supplementary table 2 with 1/100 DAA for LOctaion
+
+```{r tab, echo=FALSE, error=FALSE, message=FALSE}
+library(pacman)
+p_load(flextable, dplyr, officer)
+library(data.table)
+
+df <- tibble::tribble(
+    ~Family,   ~Locationo,   ~locationt,  	~Genus,       ~p,
+   "A-C",      "Ahmednagar",   "Pune",      "Bacillus",   0.02,
+   "A-F",     "Ahmednagar",   "Pune",      "Bacillus",    0.01,
+   "A-L",     "Ahmednagar",   "Pune",      "Bacillus",    0.04,
+   "A-N",     "Ahmednagar",   "Pune",      "Bacillus",    0.01,
+   "B-D",     "Ahmednagar",   "Ahmednagar", "Anaerococcus", 0.01,
+  "B-E",      "Ahmednagar",   "Ahmednagar", "Anaerococcus", 0.01,
+  "B-C",      "Ahmednagar",   "Pune",       "Anaerococcus", 0.05,
+  "B-F",      "Ahmednagar",   "Pune",       "Anaerococcus", 0.02,
+  "B-G",       "Ahmednagar",   "Pune",       "Anaerococcus", 0.07,
+  "B-H",       "Ahmednagar",   "Pune",       "Anaerococcus", 0.02,
+  "B-H",       "Ahmednagar",   "Pune",       "Staphylococcus", 0.05,
+  "C-E",       "Pune",         "Ahmednagar",   "Bacillus",   0.01,
+  "C-K",       "Pune",         "Ahmednagar",    "Bacillus",   0.01,
+   "D-H",      "Ahmednagar",   "Pune",       "Staphylococcus", 0.04,
+   "D-M",      "Ahmednagar",   "Pune",       "Anaerococcus", 0.02
+ )
+
+# Set universal border color as black; otherwise it will will be dark grey.
+set_flextable_defaults(border.color = "black")
+
+# Create a flextable based on the dataset above
+ft <- flextable(df)
+
+ftt <- set_header_labels(ft, values = c(Family = "Family comparison",
+                                        Locationo= ""
+                                        Genus = "Genus",
+                                          p = "p-value"))
+ft_1 <- theme_booktabs(ftt, bold_header = TRUE)
+#ft_1 <- align(ft_1, i = 1, j = NULL, align = "center", part = "all")
+ft5 <- add_footer_lines(ft_1, "Note- The p-value indicates level of significance <0.001∗∗∗, <0.01∗∗, <0.05∗, 0.1 ns")
+ft6 <- set_table_properties(ft5, width = 0.5, layout = "autofit")
+ft6 <- align(ft6, part = "all", i = NULL, j = NULL, align = "center")
+ft7 <- fontsize(ft6, i = NULL, j = NULL, size = 11, part = "footer")
+ft7
+ft_8 <- italic(ft7, i = NULL, j = "Genus", italic = TRUE, part = "body")
 ```

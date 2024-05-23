@@ -5,10 +5,17 @@ date: "2023-09-19"
 output: html_document
 ---
 
-```{r core, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r l, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 library(mia)
 library(miaViz)
 library(dplyr)
+library(ggplot2)
+library(knitr)
+library(tidyverse)
+```
+
+
+```{r core, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fam_tse <- readRDS("data/fam_tse.rds")
 tse <- relAbundanceCounts(fam_tse)
 tse_Genus <- agglomerateByRank(tse, rank ="Genus", onRankOnly=TRUE)
@@ -20,21 +27,26 @@ rowData(tse)$Genus <- as.character(Genus_renamed)
 merged <- mergeCols(tse, colData(tse)$Family)
 merged1 <- transformCounts(merged, abund_values = "counts",
                               method = "relabundance")
-ttse_list <- splitOn(merged1, f= "Location")
-ttse_Ahmednagar <- ttse_list[[1]]
-ttse_Pune <- ttse_list[[2]]
+tse_list <- splitOn(merged1, f= "Location")
+tse_Ahmednagar <- tse_list[[1]]
+tse_Pune <- tse_list[[2]]
 
 
 tse_subsetPune <- merged1[ , merged1$Location %in% "Pune"]
+#a <- plotAbundance(tse_subsetPune, assay_name="relabundance", rank = "Genus",
+#              #order_rank_by="abund", 
+#              order_sample_by = "Staphylococcus", add_x_text = TRUE)+ labs(x = "Families", y = "Relative abundance #(%)", title = "C. Pune")
+
 a <- plotAbundance(tse_subsetPune, assay_name="relabundance", rank = "Genus",
               #order_rank_by="abund", 
-              order_sample_by = "Staphylococcus", add_x_text = TRUE)+ labs(x = "Families", y = "Relative abundance (%)", title = "C. Pune")
+              order_sample_by = "Staphylococcus", add_x_text = TRUE)+ labs(x = "Families", y = "", title = "Pune") + scale_y_continuous(label=scales::percent)
+
 #print(a)
 
 tse_subsetAhmednagar <- merged1[ , merged1$Location %in% "Ahmednagar"]
 b <- plotAbundance(tse_subsetAhmednagar, assay_name="relabundance", rank = "Genus",
               #order_rank_by="abund", 
-              order_sample_by = "Staphylococcus", add_x_text = TRUE) + labs(x = "Families", y = "", title = "B. Ahmednagar") + theme(axis.text.y=element_blank())
+              order_sample_by = "Staphylococcus", add_x_text = TRUE) + labs(x = "Families", y = "Relative abundance (%)", title = "B. Ahmednagar") + theme(axis.text.y=element_blank(), legend.position="none") +  scale_y_continuous(label=scales::percent)
 #print(b)
 c <- b+a
 print(c)
@@ -43,10 +55,6 @@ print(c)
 ## phylum
 
 ```{r phyla, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-library(ggplot2)
-library(miaViz)
-library(mia)
-
 fam_tse <- readRDS("data/fam_tse.rds")
 tse <- relAbundanceCounts(fam_tse)
 tse_Phylum <- agglomerateByRank(tse, rank ="Phylum", onRankOnly=TRUE)
@@ -65,7 +73,7 @@ tse_Phylum <- transformCounts(tse_Phylum,
 
 tse_Phylum <- transformFeatures(tse_Phylum, assay_name = "clr", 
                               method = "z", name = "clr_z")
-library(dplyr)
+
 library(ComplexHeatmap)
 sorted_coldata <- as.data.frame(colData(tse_Phylum)) %>%
   arrange(Location)
@@ -92,9 +100,6 @@ print(hm)
 ## Most prevelent genera
 
 ```{r core_genera, echo=FALSE, message=FALSE}
-library(knitr)
-library(tidyverse)
-library(miaViz)
 
 tse <- readRDS("data/fam_tse.rds")
 
@@ -110,6 +115,13 @@ rowData(altExp(tse, "Genus"))[["mean"]] <- rowData(altExp(tse, "Genus"))[["mean"
 
 # Calculate median
 rowData(altExp(tse, "Genus"))[["median"]] <- rowMedians(assay(altExp(tse, "Genus"), "relabundance"))
+
+#Calculate sd
+rowData(altExp(tse, "Genus"))[["sd"]] <- rowSds(assay(altExp(tse, "Genus"), "relabundance"))
+
+#Calculate quantiles
+#rowData(altExp(tse, "Genus"))[["Quantiles"]] <- rowQuantiles(assay(altExp(tse, "Genus"), "relabundance"))
+rowData(altExp(tse, "Genus"))[["IQR"]] <- rowIQRs(assay(altExp(tse, "Genus"), "relabundance"))
 
 # Get table,, order features based on median value, take only top 6
 df <- rowData(altExp(tse, "Genus"))
@@ -139,6 +151,13 @@ rowData(altExp(tse, "Phylum"))[["mean"]] <- rowData(altExp(tse, "Phylum"))[["mea
 # Calculate median
 rowData(altExp(tse, "Phylum"))[["median"]] <- rowMedians(assay(altExp(tse, "Phylum"), "relabundance"))
 
+
+##Calculating sd
+rowData(altExp(tse, "Phylum"))[["sd"]] <- rowSds(assay(altExp(tse, "Phylum"), "relabundance"))
+
+#Calculate Inter quantile renge
+rowData(altExp(tse, "Phylum"))[["IQR"]] <- rowIQRs(assay(altExp(tse, "Phylum"), "relabundance"))
+
 # Get table,, order features based on median value, take only top 3
 df <- rowData(altExp(tse, "Phylum"))
 df <- df[ order(df[["median"]], decreasing = TRUE), ]
@@ -149,3 +168,161 @@ head(getPrevalence(fam_tse, rank = "Phylum", detection = 0.1/100, sort = TRUE,
                    assay.type = "counts", as_relative = TRUE))
 ```
 
+## Individual wise relative abundances of most prevelent genera in the families across locations: Supplementary figure 2
+
+
+```{r core_supplementary, echo=FALSE, message=FALSE, warning=FALSE}
+
+## For pune 
+fam_tse <- readRDS("data/fam_tse.rds")
+tse <- relAbundanceCounts(fam_tse)
+tse_Genus <- agglomerateByRank(tse, rank ="Genus", onRankOnly=TRUE)
+top_taxa <- getTopTaxa(tse_Genus,top =6, detection = 0.1/100, prevalence = 1/100, method = "prevalence", assay_name = "relabundance")
+Genus_renamed <- lapply(rowData(tse)$Genus,
+                   function(x){if (x %in% top_taxa) {x} else {"Other"}})
+rowData(tse)$Genus <- as.character(Genus_renamed)
+#merged <- mergeCols(tse, colData(tse)$Family)
+merged <- transformAssay(tse, abund_values = "counts",
+                              method = "relabundance")
+tse_list <- splitOn(merged, f= "Location")
+tse_Ahmednagar <- tse_list[[1]]
+tse_Pune <- tse_list[[2]]
+
+tse_subsetPune <- merged[ , merged$Location %in% "Pune"]
+
+staph_p <- tse_subsetPune[rowData(tse_subsetPune)$Genus %in% "Staphylococcus"]
+staph_p <-  mia::meltAssay(staph_p,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+a1 <- ggplot(staph_p, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size= 1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Staphylococcus") + theme (legend.position = "none")
+
+Anaero_p <- tse_subsetPune[rowData(tse_subsetPune)$Genus %in% "Anaerococcus"]
+Anaero_p <-  mia::meltAssay(Anaero_p,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+a2 <- ggplot(Anaero_p, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size= 1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Anaerococcus") + theme (legend.position = "none") 
+
+Bacillus_p <- tse_subsetPune[rowData(tse_subsetPune)$Genus %in% "Bacillus"]
+Bacillus_p <-  mia::meltAssay(Bacillus_p,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+a3 <- ggplot(Bacillus_p, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size= 1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Bacillus") + theme (legend.position = "none")
+
+
+Coryne_p <- tse_subsetPune[rowData(tse_subsetPune)$Genus %in% "Corynebacterium"]
+Coryne_p <-  mia::meltAssay(Coryne_p,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+a4 <- ggplot(Coryne_p, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size= 1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Corynebacterium") + theme (legend.position = "none")
+
+Derma_p <- tse_subsetPune[rowData(tse_subsetPune)$Genus %in% "Dermabacter"]
+Derma_p <-  mia::meltAssay(Derma_p,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+a5 <- ggplot(Derma_p, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size= 1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Dermabacter") + theme (legend.position = "none")
+
+Pseudo_p <- tse_subsetPune[rowData(tse_subsetPune)$Genus %in% "Pseudomonas"]
+Pseudo_p <-  mia::meltAssay(Pseudo_p,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+a6 <- ggplot(Pseudo_p, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size=1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Pseudomonas") + theme (legend.position = "none")
+
+
+Other_p <- tse_subsetPune[rowData(tse_subsetPune)$Genus %in% "Other"]
+Other_p <-  mia::meltAssay(Other_p,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+a7 <- ggplot(Other_p, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size=1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Other") + guides(color = guide_legend(title = "Generation")) + theme(legend.title = element_text(size=12, face="bold"), legend.text = element_text(size=10)) + theme(legend.position = "left") + scale_y_log10(label = scales::percent) 
+
+
+a8 <- ggplot(Other_p, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size=1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Other") + guides(color = guide_legend(title = "Generation")) + theme (legend.position = "none")
+
+library(ggpubr)
+legend <- get_legend(a7)
+a9 <- as_ggplot(legend)
+
+
+## For Ahmednagar
+tse_subsetAhmednagar <- merged[ , merged$Location %in% "Ahmednagar"]
+
+staph_a <- tse_subsetAhmednagar[rowData(tse_subsetAhmednagar)$Genus %in% "Staphylococcus"]
+staph_a <-  mia::meltAssay(staph_a,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+b1 <- ggplot(staph_a, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size=1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Staphylococcus") + theme (legend.position = "none")
+
+Anaero_a <- tse_subsetAhmednagar[rowData(tse_subsetAhmednagar)$Genus %in% "Anaerococcus"]
+Anaero_a <-  mia::meltAssay(Anaero_a,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+b2 <- ggplot(Anaero_a, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size=1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Anaerococcus") + theme (legend.position = "none") 
+
+Bacillus_a <- tse_subsetAhmednagar[rowData(tse_subsetAhmednagar)$Genus %in% "Bacillus"]
+Bacillus_a <-  mia::meltAssay(Bacillus_a,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+b3 <- ggplot(Bacillus_a, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size=1.5) +  scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Bacillus") + theme (legend.position = "none")
+
+
+Coryne_a <- tse_subsetAhmednagar[rowData(tse_subsetAhmednagar)$Genus %in% "Corynebacterium"]
+Coryne_a <-  mia::meltAssay(Coryne_a,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+b4 <- ggplot(Coryne_a, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size= 1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Corynebacterium") + theme (legend.position = "none")
+
+Derma_a <- tse_subsetAhmednagar[rowData(tse_subsetAhmednagar)$Genus %in% "Dermabacter"]
+Derma_a <-  mia::meltAssay(Derma_a,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+b5 <- ggplot(Derma_a, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size= 1.5) + scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Dermabacter") + theme (legend.position = "none")
+
+Pseudo_a <- tse_subsetAhmednagar[rowData(tse_subsetAhmednagar)$Genus %in% "Pseudomonas"]
+Pseudo_a <-  mia::meltAssay(Pseudo_a,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+b6 <- ggplot(Pseudo_a, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size=1.5) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Pseudomonas") + theme (legend.position = "none") + scale_y_log10(label = scales::percent)
+
+
+Other_a <- tse_subsetAhmednagar[rowData(tse_subsetAhmednagar)$Genus %in% "Other"]
+Other_a <-  mia::meltAssay(Other_a,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+b7 <- ggplot(Other_a, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size=1.5) +  scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Other") + guides(color = guide_legend(title = "Generation")) + theme(legend.title = element_text(size=12, face="bold"), legend.text = element_text(size=10)) + theme(legend.position = "left") + scale_y_log10(label = scales::percent) 
+
+b8 <- ggplot(Other_a, aes(x=Family.y, y=relabundance, colour=G)) + geom_point(size=1.5) +  scale_y_log10(label = scales::percent) + theme_bw() + labs(x="Family", y="Relative abundance (%)", title = "Other")  + theme (legend.position = "none") #+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+library(ggpubr)
+legend <- get_legend(b7)
+b9 <- as_ggplot(legend)
+
+library(gridExtra)
+grid.arrange(grobs = list(b1, b2, b3, b4, b5, b6, b8, b9), top = "A. Relative abundances of most prevelent genera in families across Ahmednagar", ncol=3)
+grid.arrange(grobs = list(a1, a2, a3, a4, a5, a6, a8, a9), top = "B. Relative abundances of most prevelent genera in families across Pune", ncol=3)
+```

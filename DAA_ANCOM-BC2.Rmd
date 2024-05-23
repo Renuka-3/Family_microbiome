@@ -1,0 +1,1239 @@
+---
+title: "DAA_ANCOM-BC2"
+author: "Renuka"
+date: "2024-03-02"
+output: html_document
+---
+
+## DAA for location using ANCOM-BC2
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Genus",
+                             prevalence = 1/100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for location
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Location",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1/100,
+                         group = "Location",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         global = TRUE)
+ancombc2_out$res %>%
+  dplyr::select(taxon, lfc_LocationPune,  q_LocationPune) %>%
+  filter(q_LocationPune < 0.05) %>%
+  arrange(q_LocationPune) %>%
+  head() %>%
+  knitr::kable()
+
+library(ggpubr)
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Bacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+y1 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Bacillus") + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 1.1,label = "0.004") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent) 
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Staphylococcus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+y2 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Staphylococcus") + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 1.1,label = "0.007") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent) 
+
+#y2 <- ggboxplot(molten_tse, x = "Location", y = "relabundance") + labs(x= "Location",  y = "Relative abundance (%)", title = "Staphylococcus") + geom_jitter(width = 0.08, size = 2) +scale_y_continuous(label=scales::percent) + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 1.1,label = "0.007") +  theme_bw() + theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18))
+
+
+library(gridExtra)
+library(ggpubr)
+gridExtra::grid.arrange(y1, y2, nrow=2)
+
+
+#Structural zeros (taxon presence/absence)
+tab_zero = ancombc2_out$zero_ind
+tab_zero %>%
+    datatable(caption = "The detection of structural zeros")
+
+#ANCOM-BC2 primary analysis
+res_prim = ancombc2_out$res
+df_Location = res_prim
+#df_Location = res_prim %>% dplyr::select(taxon, ends_with("Location")) 
+df_fig_Location = df_Location %>%
+    dplyr::filter(diff_LocationPune == 1) %>% 
+    dplyr::arrange(desc(lfc_LocationPune)) %>%
+    dplyr::mutate(direct = ifelse(lfc_LocationPune > 0, "Positive LFC", "Negative LFC"),
+                  color = ifelse(passed_ss_LocationPune == 1, "aquamarine3", "black"))
+df_fig_Location$taxon = factor(df_fig_Location$taxon, levels = df_fig_Location$taxon)
+df_fig_Location$direct = factor(df_fig_Location$direct, 
+                           levels = c("Positive LFC", "Negative LFC"))
+  
+fig_Location = df_fig_Location %>%
+    ggplot(aes(x = taxon, y = lfc_LocationPune, fill = direct)) + 
+    geom_bar(stat = "identity", width = 0.7, color = "black", 
+             position = position_dodge(width = 0.4)) +
+    geom_errorbar(aes(ymin = lfc_LocationPune - se_LocationPune, ymax = lfc_LocationPune + se_LocationPune), 
+                  width = 0.2, position = position_dodge(0.05), color = "black") + 
+    labs(x = NULL, y = "Log fold change", 
+         title = "Log fold changes between two Locations") + 
+    scale_fill_discrete(name = NULL) +
+    scale_color_discrete(name = NULL) +
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5),
+          panel.grid.minor.y = element_blank(),
+          axis.text.x = element_text(angle = 0, hjust = 0.5,
+                                     color = df_fig_Location$color)) + theme(axis.text.x=element_text(colour="black")) + scale_fill_discrete(name = "Location", labels = c("Pune", "Ahmednagar"))
+fig_Location
+
+#ANCOM-BC2 multiple pairwise comparisons
+res_pair = ancombc2_out$res_pair %>%
+    mutate_if(is.numeric, function(x) round(x, 2))
+res_pair[1:2, ] %>%
+    datatable(caption = "ANCOM-BC2 Multiple Pairwise Comparisons")
+
+#Dunnett’s type of test
+
+```
+
+## DAA for location and family using ANCOM-BC2
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Genus",
+                             prevalence = 0 / 100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for location
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Family",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1,
+                         group = "Family",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         # multi group comparison is deactivated automatically
+                         global = TRUE)
+ancombc2_out$res %>%
+  dplyr::select(taxon, lfc_LocationPune,  q_LocationPune) %>%
+  filter(q_LocationPune < 0.05) %>%
+  arrange(q_LocationPune) %>%
+  head() %>%
+  knitr::kable()
+
+#Structural zeros (taxon presence/absence)
+tab_zero = ancombc2_out$zero_ind
+tab_zero %>%
+    datatable(caption = "The detection of structural zeros")
+
+#ANCOM-BC2 primary analysis
+res_prim = ancombc2_out$res
+df_Location = res_prim
+#df_Location = res_prim %>% dplyr::select(taxon, ends_with("Location")) 
+df_fig_Location = df_Location %>%
+    dplyr::filter(diff_LocationPune == 1) %>% 
+    dplyr::arrange(desc(lfc_LocationPune)) %>%
+    dplyr::mutate(direct = ifelse(lfc_LocationPune > 0, "Positive LFC", "Negative LFC"),
+                  color = ifelse(passed_ss_LocationPune == 1, "aquamarine3", "black"))
+df_fig_Location$taxon = factor(df_fig_Location$taxon, levels = df_fig_Location$taxon)
+df_fig_Location$direct = factor(df_fig_Location$direct, 
+                           levels = c("Positive LFC", "Negative LFC"))
+  
+fig_Location = df_fig_Location %>%
+    ggplot(aes(x = taxon, y = lfc_LocationPune, fill = direct)) + 
+    geom_bar(stat = "identity", width = 0.7, color = "black", 
+             position = position_dodge(width = 0.4)) +
+    geom_errorbar(aes(ymin = lfc_LocationPune - se_LocationPune, ymax = lfc_LocationPune + se_LocationPune), 
+                  width = 0.2, position = position_dodge(0.05), color = "black") + 
+    labs(x = NULL, y = "Log fold change", 
+         title = "Log fold changes between two Locations") + 
+    scale_fill_discrete(name = NULL) +
+    scale_color_discrete(name = NULL) +
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5),
+          panel.grid.minor.y = element_blank(),
+          axis.text.x = element_text(angle = 0, hjust = 0.5,
+                                     color = df_fig_Location$color)) + theme(axis.text.x=element_text(colour="black"))
+fig_Location
+
+#ANCOM-BC2 multiple pairwise comparisons
+res_pair = ancombc2_out$res_pair %>%
+    mutate_if(is.numeric, function(x) round(x, 2))
+res_pair[1:2, ] %>%
+    datatable(caption = "ANCOM-BC2 Multiple Pairwise Comparisons")
+
+#Dunnett’s type of test
+
+```
+
+## DAA for Family using ANCOM-BC2
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Genus",
+                             prevalence = 0 / 100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for family
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Family",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1,
+                         group = "Family",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         # multi group comparison is deactivated automatically
+                         global = TRUE,
+                         pairwise = TRUE)
+
+ancombc2_out$res %>%
+  dplyr::select(taxon, starts_with("lfc_") | starts_with("q_")) %>% 
+  filter(q_FamilyB < 0.05 | q_FamilyC < 0.05 | q_FamilyD < 0.05 | q_FamilyE < 0.05| q_FamilyF < 0.05 | q_FamilyG < 0.05|q_FamilyH < 0.05| q_FamilyI < 0.05 |q_FamilyJ < 0.05| q_FamilyK < 0.05| q_FamilyL < 0.05| q_FamilyM < 0.05| q_FamilyN < 0.05| q_FamilyO < 0.05) %>%
+  head() %>%
+  knitr::kable()
+
+ancombc2_out$res %>%
+  dplyr::select(taxon, starts_with("lfc_") | starts_with("q_")) %>% 
+  filter(q_FamilyB < 0.05 & q_FamilyC < 0.05 & q_FamilyD < 0.05 & q_FamilyE < 0.05 & q_FamilyF < 0.05 & q_FamilyG < 0.05 & q_FamilyH < 0.05 & q_FamilyI < 0.05 & q_FamilyJ < 0.05 & q_FamilyK < 0.05 & q_FamilyL < 0.05 & q_FamilyM < 0.05 & q_FamilyN < 0.05 & q_FamilyO < 0.05) %>%
+  head() %>%
+  knitr::kable()
+
+ancombc2_out$res %>% 
+  
+my_vars <- function() 
+    {
+  c(any_of("taxon"), starts_with("lfc_")| starts_with("q_"))
+}
+
+#ANCOM-BC2 primary analysis
+res_prim = ancombc2_out$res
+df_family = res_prim
+
+df_fig_family = df_family %>%
+    dplyr::filter(diff_FamilyB == 1 | diff_FamilyC == 1 |diff_FamilyD == 1 |diff_FamilyE == 1 |diff_FamilyF == 1 |diff_FamilyG == 1 |diff_FamilyH == 1 |diff_FamilyI== 1 |diff_FamilyJ== 1 |diff_FamilyK== 1 |diff_FamilyL== 1 |diff_FamilyM == 1|diff_FamilyN == 1|diff_FamilyO == 1) %>% 
+    dplyr::arrange(desc(lfc_FamilyB| lfc_FamilyC|lfc_FamilyD|lfc_FamilyE|lfc_FamilyF|lfc_FamilyG|lfc_FamilyH|lfc_FamilyI|lfc_FamilyJ|lfc_FamilyK|lfc_FamilyL|lfc_FamilyM|lfc_FamilyN|lfc_FamilyO)) %>%
+    dplyr::mutate(direct = ifelse(lfc_FamilyB > 0| lfc_FamilyC > 0| lfc_FamilyD > 0|lfc_FamilyD > 0|lfc_FamilyE > 0|lfc_FamilyF > 0|lfc_FamilyG > 0|lfc_FamilyH > 0|lfc_FamilyI > 0|lfc_FamilyJ > 0|lfc_FamilyK > 0|lfc_FamilyL > 0| lfc_FamilyM > 0|lfc_FamilyN > 0|lfc_FamilyO > 0, "Positive LFC", "Negative LFC"),
+                  color = ifelse(passed_ss_FamilyB == 1 | passed_ss_FamilyC == 1 | passed_ss_FamilyD == 1 |passed_ss_FamilyE == 1 |passed_ss_FamilyF == 1 |passed_ss_FamilyG == 1 |passed_ss_FamilyH == 1 |passed_ss_FamilyI == 1 |passed_ss_FamilyJ == 1 |passed_ss_FamilyK == 1 |passed_ss_FamilyL == 1 |passed_ss_FamilyM == 1 |passed_ss_FamilyN == 1 | passed_ss_FamilyO == 1, "aquamarine3", "black"))
+df_fig_family$taxon = factor(df_fig_family$taxon, levels = df_fig_family$taxon)
+df_fig_family$direct = factor(df_fig_family$direct, 
+                           levels = c("Positive LFC", "Negative LFC"))
+
+fig_family = df_fig_family %>%
+    ggplot(aes(x = taxon, y = lfc_familyB| lfc_familyC| lfc_familyD|lfc_familyE|lfc_familyF|lfc_familyG|lfc_familyH|lfc_familyI|lfc_familyJ|lfc_familyK|lfc_familyL| lfc_familyM|lfc_familyN|lfc_familyO, fill = direct)) + 
+    geom_bar(stat = "identity", width = 0.7, color = "black", 
+             position = position_dodge(width = 0.4)) +
+    geom_errorbar(aes(ymin = lfc_familyB - se_familyB, ymax = lfc_familyB + se_familyB | 
+                        ymin = lfc_familyC - se_familyC, ymax = lfc_familyC + se_familyC |
+                        ymin = lfc_familyD - se_familyD, ymax = lfc_familyD + se_familyD |
+                        ymin = lfc_familyE - se_familyE, ymax = lfc_familyE + se_familyE |
+                        ymin = lfc_familyF - se_familyF, ymax = lfc_familyF + se_familyF |
+                        ymin = lfc_familyG - se_familyG, ymax = lfc_familyG + se_familyG |
+                        ymin = lfc_familyH - se_familyH, ymax = lfc_familyH + se_familyH |
+                        ymin = lfc_familyI - se_familyI, ymax = lfc_familyI + se_familyI |
+                        ymin = lfc_familyJ - se_familyJ, ymax = lfc_familyJ + se_familyJ |
+                        ymin = lfc_familyK - se_familyK, ymax = lfc_familyK + se_familyK |
+                        ymin = lfc_familyL - se_familyL, ymax = lfc_familyL + se_familyL |
+                        ymin = lfc_familyM - se_familyM, ymax = lfc_familyM + se_familyM |
+                        ymin = lfc_familyN - se_familyN, ymax = lfc_familyN + se_familyN |
+                        ymin = lfc_familyO - se_familyO, ymax = lfc_familyO + se_familyO), 
+                  width = 0.2, position = position_dodge(0.05), color = "black") + 
+    labs(x = NULL, y = "Log fold change", 
+         title = "Log fold changes between two Locations") + 
+    scale_fill_discrete(name = NULL) +
+    scale_color_discrete(name = NULL) +
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5),
+          panel.grid.minor.y = element_blank(),
+          axis.text.x = element_text(angle = 0, hjust = 0.5,
+                                     color = df_fig_family$color)) + theme(axis.text.x=element_text(colour="black"))
+fig_family
+
+fig_family = df_fig_family %>%
+    ggplot(aes(x = taxon, y = lfc_familyB| lfc_familyC| lfc_familyD|lfc_familyE|lfc_familyF|lfc_familyG|lfc_familyH|lfc_familyI|lfc_familyJ|lfc_familyK|lfc_familyL| lfc_familyM|lfc_familyN|lfc_familyO, fill = direct)) + 
+    geom_bar(stat = "identity", width = 0.7, color = "black", 
+             position = position_dodge(width = 0.4)) +
+    geom_errorbar(aes(ymin = c(lfc_familyB - se_familyB | lfc_familyC - se_familyC |lfc_familyD - se_familyD | lfc_familyF - se_familyF | lfc_familyE - se_familyE | lfc_familyG - se_familyG |lfc_familyH - se_familyH |lfc_familyI - se_familyI | lfc_familyJ - se_familyJ | lfc_familyK - se_familyK | lfc_familyL - se_familyL | lfc_familyM - se_familyM | lfc_familyN - se_familyN | lfc_familyO - se_familyO), ymax = c(lfc_familyB + se_familyB | lfc_familyC + se_familyC | lfc_familyD + se_familyD | lfc_familyE + se_familyE |lfc_familyF + se_familyF |lfc_familyG + se_familyG |lfc_familyH + se_familyH |lfc_familyI + se_familyI |lfc_familyJ + se_familyJ |lfc_familyK + se_familyK | lfc_familyL + se_familyL| lfc_familyM + se_familyM |lfc_familyN + se_familyN | lfc_familyO + se_familyO), 
+                  width = 0.2, position = position_dodge(0.05), color = "black")) + 
+    labs(x = NULL, y = "Log fold change", 
+         title = "Log fold changes between two Locations") + 
+    scale_fill_discrete(name = NULL) +
+    scale_color_discrete(name = NULL) +
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5),
+          panel.grid.minor.y = element_blank(),
+          axis.text.x = element_text(angle = 0, hjust = 0.5,
+                                     color = df_fig_family$color)) + theme(axis.text.x=element_text(colour="black"))
+fig_family
+
+
+fig_family = df_fig_family %>%
+    ggplot(aes(x = taxon, y = lfc_familyB & lfc_familyC & lfc_familyD & lfc_familyE & lfc_familyF & lfc_familyG & lfc_familyH & lfc_familyI & lfc_familyJ & lfc_familyK & lfc_familyL & lfc_familyM & lfc_familyN & lfc_familyO, fill = direct)) + 
+    geom_bar(stat = "identity", width = 0.7, color = "black", 
+             position = position_dodge(width = 0.4)) +
+    geom_errorbar(aes(ymin = c(lfc_familyB - se_familyB | lfc_familyC - se_familyC |lfc_familyD - se_familyD | lfc_familyF - se_familyF | lfc_familyE - se_familyE | lfc_familyG - se_familyG |lfc_familyH - se_familyH |lfc_familyI - se_familyI | lfc_familyJ - se_familyJ | lfc_familyK - se_familyK | lfc_familyL - se_familyL | lfc_familyM - se_familyM | lfc_familyN - se_familyN | lfc_familyO - se_familyO), ymax = c(lfc_familyB + se_familyB | lfc_familyC + se_familyC | lfc_familyD + se_familyD | lfc_familyE + se_familyE |lfc_familyF + se_familyF |lfc_familyG + se_familyG |lfc_familyH + se_familyH |lfc_familyI + se_familyI |lfc_familyJ + se_familyJ |lfc_familyK + se_familyK | lfc_familyL + se_familyL| lfc_familyM + se_familyM |lfc_familyN + se_familyN | lfc_familyO + se_familyO), 
+                  width = 0.2, position = position_dodge(0.05), color = "black")) + 
+    labs(x = NULL, y = "Log fold change", 
+         title = "Log fold changes between two Locations") + 
+    scale_fill_discrete(name = NULL) +
+    scale_color_discrete(name = NULL) +
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5),
+          panel.grid.minor.y = element_blank(),
+          axis.text.x = element_text(angle = 0, hjust = 0.5,
+                                     color = df_fig_family$color)) + theme(axis.text.x=element_text(colour="black"))
+fig_family
+
+data = as.data.frame(df_fig_family)
+fig_family = data %>%
+    ggplot(aes(x = taxon, y = c(lfc_familyB & lfc_familyC & lfc_familyD & lfc_familyE & lfc_familyF & lfc_familyG & lfc_familyH & lfc_familyI & lfc_familyJ & lfc_familyK & lfc_familyL & lfc_familyM & lfc_familyN & lfc_familyO), fill = direct))
+
+
+fig_family = df_fig_family %>%
+    ggplot(aes(x = taxon, y = c(lfc_familyB & lfc_familyC & lfc_familyD & lfc_familyE & lfc_familyF & lfc_familyG & lfc_familyH & lfc_familyI & lfc_familyJ & lfc_familyK & lfc_familyL & lfc_familyM & lfc_familyN & lfc_familyO), fill = direct))
+
+
+fig_family = df_fig_family %>%
+    ggplot(aes(x = taxon, y = c(lfc_familyB| lfc_familyC| lfc_familyD |lfc_familyE |lfc_familyF |lfc_familyG |lfc_familyH |lfc_familyI|lfc_familyJ|lfc_familyK|lfc_familyL| lfc_familyM|lfc_familyN|lfc_familyO), fill = direct))
+
+res <- ancombc2_out$res_global %>% arrange(desc(W))
+top.taxa <- res.sorted[which(res.sorted[,3]), "taxa_id"]
+head(res)
+
+
+##################################################visualisation of ancombc2 form TSE###########################
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% c("Bacillus", "Pseudomonas", "Staphylococcus")]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+p0 <- ggboxplot(molten_tse, x = "Family.y", y = "relabundance", xlab = "Family",  ylab = "Abundance", color = "Genus")
+
+
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Bacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+p0 <- ggboxplot(molten_tse, x = "Family.y", y = "relabundance", xlab = "Family",  ylab = "Abundance", color = "Genus")
+
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Pseudomonas"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+p1 <- ggboxplot(molten_tse, x = "Family.y", y = "relabundance", xlab = "Family",  ylab = "Abundance", color = "Genus")
+
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Staphylococcus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+p2 <- ggboxplot(molten_tse, x = "Family.y", y = "relabundance", xlab = "Family",  ylab = "Abundance", color = "Genus")
+library(gridExtra)
+library(ggpubr)
+gridExtra::grid.arrange(p0, p1, p2, ncol = 3, widths=c(0.5, 0.5), heights = c(10, 4))
+gridExtra::grid.arrange(p0, p1, p2)
+
+
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% c("Bacillus", "Pseudomonas", "Staphylococcus")]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else {
+  print("Kruskal-Wallis test is not significant, no further analysis performed.")
+}
+
+
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Bacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)#############################################
+y <- ggplot(molten_tse, aes(x = "Location", y = "relabundance", fill = "location")) + labs(x= "Location",  y = "Abundance")
+y <- ggboxplot(molten_tse, x = "Location", y = "relabundance") + labs(x= "Location",  y = "Abundance")
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else {
+  print("Kruskal-Wallis test is not significant, no further analysis performed.")
+}
+ dunn.results[[tax]] <- dunn_result
+
+ 
+d <- colData(tse_subset_by_feature)
+library(FSA)
+p.adj.method <- "bh"
+dunn.results <- list()
+figures <- list()
+library(beeswarm)
+for (tax in molten_tse) {
+  #d$taxa <- abundances(tse)[tax, ]
+   re <- dunnTest(relabundance ~ Family.y, data=molten_tse, method = p.adj.method, list= TRUE) #Pairwise comparisons using Dunn test
+  dunn.results[[tax]] <- re
+  #print(dunn.results)
+  stat.test <- re$res
+  stat.test$group1 <- stringr::word(re$res$Comparison, 1)
+  stat.test$group2 <- stringr::word(re$res$Comparison, 3)
+  head(stat.test)
+  stat.test <- stat.test %>% mutate(y.position = c(0.025, 0.015, 0.02))
+  stat.test$P.adj.signif <-cut(stat.test$P.adj, breaks=c(0, 0.001, 0.01, 0.05, 1), labels=c("***", "**","*","ns"))
+}
+
+#ANCOM-BC2 primary analysis
+
+res_prim = ancombc2_out$res
+df_family = res_prim
+
+
+#AGE
+df_family = res_prim %>%
+    dplyr::select(taxon, contains("family")) 
+
+df_fig_bmi1 = df_bmi %>%
+    dplyr::filter(diff_bmilean == 1 | 
+                    diff_bmioverweight == 1) %>%
+    dplyr::mutate(lfc1 = ifelse(diff_bmioverweight == 1, 
+                                round(lfc_bmioverweight, 2), 0),
+                  lfc2 = ifelse(diff_bmilean == 1, 
+                                round(lfc_bmilean, 2), 0)) %>%
+    tidyr::pivot_longer(cols = lfc1:lfc2, 
+                        names_to = "group", values_to = "value") %>%
+    dplyr::arrange(taxon)
+
+df_fig_bmi2 = df_bmi %>%
+    dplyr::filter(diff_bmilean == 1 | 
+                    diff_bmioverweight == 1) %>%
+    dplyr::mutate(lfc1 = ifelse(passed_ss_bmioverweight == 1 & diff_bmioverweight == 1, 
+                                "aquamarine3", "black"),
+                  lfc2 = ifelse(passed_ss_bmilean == 1 & diff_bmilean == 1, 
+                                "aquamarine3", "black")) %>%
+    tidyr::pivot_longer(cols = lfc1:lfc2, 
+                        names_to = "group", values_to = "color") %>%
+    dplyr::arrange(taxon)
+
+df_fig_bmi = df_fig_bmi1 %>%
+    dplyr::left_join(df_fig_bmi2, by = c("taxon", "group"))
+
+df_fig_bmi$group = recode(df_fig_bmi$group, 
+                          `lfc1` = "Overweight - Obese",
+                          `lfc2` = "Lean - Obese")
+df_fig_bmi$group = factor(df_fig_bmi$group, 
+                          levels = c("Overweight - Obese",
+                                     "Lean - Obese"))
+  
+lo = floor(min(df_fig_bmi$value))
+up = ceiling(max(df_fig_bmi$value))
+mid = (lo + up)/2
+fig_bmi = df_fig_bmi %>%
+  ggplot(aes(x = group, y = taxon, fill = value)) + 
+  geom_tile(color = "black") +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                       na.value = "white", midpoint = mid, limit = c(lo, up),
+                       name = NULL) +
+  geom_text(aes(group, taxon, label = value, color = color), size = 4) +
+  scale_color_identity(guide = FALSE) +
+  labs(x = NULL, y = NULL, title = "Log fold changes as compared to obese subjects") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+fig_bmi
+```
+#########Family final with ancombc2##############
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Genus",
+                             prevalence = 0 / 100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for family
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Family",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1,
+                         group = "Family",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         # multi group comparison is deactivated automatically
+                         global = TRUE,
+                         pairwise = TRUE)
+
+ancombc2_out$res %>%
+  dplyr::select(taxon, starts_with("lfc_") | starts_with("q_")) %>% 
+  filter(q_FamilyB < 0.05 | q_FamilyC < 0.05 | q_FamilyD < 0.05 | q_FamilyE < 0.05| q_FamilyF < 0.05 | q_FamilyG < 0.05|q_FamilyH < 0.05| q_FamilyI < 0.05 |q_FamilyJ < 0.05| q_FamilyK < 0.05| q_FamilyL < 0.05| q_FamilyM < 0.05| q_FamilyN < 0.05| q_FamilyO < 0.05) %>%
+  head() %>%
+  knitr::kable()
+
+
+##visualisation of ancombc2 form TSE######################################################################15/3/24
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% c("Bacillus", "Pseudomonas", "Staphylococcus")]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+library(ggpubr)
+p0 <- ggboxplot(molten_tse, x = "Family.y", y = "relabundance", xlab = "Family",  ylab = "Abundance", color = "Genus") + geom_jitter() 
+
+
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Bacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+p0 <- ggboxplot(molten_tse, x = "Family.y", y = "relabundance") + labs(x= "Family",  y = "Abundance") + geom_jitter(width = 0.1, size = 0.8) + geom_boxplot() + labs(x= "Family",  y = "Abundance", title = "Bacillus") + theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18))
+
+
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Pseudomonas"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+p1 <- ggboxplot(molten_tse, x = "Family.y", y = "relabundance", xlab = "Family",  ylab = "Abundance", color = "Genus")
+
+
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Staphylococcus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+p2 <- ggboxplot(molten_tse, x = "Family.y", y = "relabundance", xlab = "Family",  ylab = "Abundance" , title = "Staphylococcus")+ theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18))
+library(gridExtra)
+library(ggpubr)
+gridExtra::grid.arrange(p0, p1, p2, ncol = 3, widths=c(0.5, 0.5), heights = c(10, 4))
+gridExtra::grid.arrange(p0, p2)
+
+##for all 3 top taxa##
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% c("Bacillus", "Pseudomonas", "Staphylococcus")]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else {
+  print("Kruskal-Wallis test is not significant, no further analysis performed.")
+}
+
+## for bacillus ##
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Bacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+library(FSA)
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else {
+  print("Kruskal-Wallis test is not significant, no further analysis performed.")
+}
+ dunn.results[[tax]] <- dunn_result
+
+ 
+## for Staphylococcus ##
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Staphylococcus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+library(FSA)
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else {
+  print("Kruskal-Wallis test is not significant, no further analysis performed.")
+}
+
+### for speudo
+## for Staphylococcus ##
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Genus")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Pseudomonas"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+library(FSA)
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else {
+  print("Kruskal-Wallis test is not significant, no further analysis performed.")
+}
+
+
+
+ dunn.results[[tax]] <- dunn_result
+ 
+ 
+d <- colData(tse_subset_by_feature)
+library(FSA)
+p.adj.method <- "bh"
+dunn.results <- list()
+figures <- list()
+library(beeswarm)
+for (tax in molten_tse) {
+  #d$taxa <- abundances(tse)[tax, ]
+   re <- dunnTest(relabundance ~ Family.y, data=molten_tse, method = p.adj.method, list= TRUE) #Pairwise comparisons using Dunn test
+  dunn.results[[tax]] <- re
+  #print(dunn.results)
+  stat.test <- re$res
+  stat.test$group1 <- stringr::word(re$res$Comparison, 1)
+  stat.test$group2 <- stringr::word(re$res$Comparison, 3)
+  head(stat.test)
+  stat.test <- stat.test %>% mutate(y.position = c(0.025, 0.015, 0.02))
+  stat.test$P.adj.signif <-cut(stat.test$P.adj, breaks=c(0, 0.001, 0.01, 0.05, 1), labels=c("***", "**","*","ns"))
+}
+
+
+
+```
+
+
+## LEfSe analysis for family  
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Phylum",
+                             prevalence = 1/100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+tse <- transformAssay(tse, assay.type = "relabundance", method = "clr", pseudocount = TRUE)
+
+library(lefser)
+new <- lefser(
+  tse,
+  kruskal.threshold = 0.05,
+  wilcox.threshold = 0.05,
+  lda.threshold = 2,
+  groupCol = "Location",
+  blockCol = NULL,
+  assay = 1L,
+  trim.names = FALSE,
+  checkAbundances = TRUE,
+  expr
+)
+lefserPlot(new)
+lefserPlot(new)
+head(marker_table(new))
+plot_cladogram(new)
+plot_cladogram(new, color = c("blue", "red"), clade_label_font_size = 3)
+# ANCOM-BC2 for family
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Family",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1,
+                         group = "Family",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         # multi group comparison is deactivated automatically
+                         global = TRUE)
+ancombc2_out$res %>%
+  dplyr::select(taxon, p_val,  q_val) %>%
+  filter(q_val < 0.05) %>%
+  arrange(q_val) %>%
+ head() %>%
+  knitr::kable()
+
+
+## DAA for Diet using ANCOM-BC2
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Genus",
+                             prevalence = 0 / 100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for location
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Diet",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1,
+                         group = "Diet",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         # multi group comparison is deactivated automatically
+                         global = TRUE)
+ancombc2_out$res %>%
+  dplyr::select(taxon, lfc_DietVeg,  q_DietVeg) %>%
+  filter(q_DietVeg < 0.05) %>%
+  arrange(q_DietVeg) %>%
+  head() %>%
+  knitr::kable()
+
+#Structural zeros (taxon presence/absence)
+tab_zero = ancombc2_out$zero_ind
+tab_zero %>%
+    datatable(caption = "The detection of structural zeros")
+
+#ANCOM-BC2 primary analysis
+res_prim = ancombc2_out$res
+df_Diet = res_prim
+#df_Location = res_prim %>% dplyr::select(taxon, ends_with("Location")) 
+df_fig_Diet = df_Diet %>%
+    dplyr::filter(diff_DietVeg == 1) %>% 
+    dplyr::arrange(desc(lfc_DietVeg)) %>%
+    dplyr::mutate(direct = ifelse(lfc_DietVeg > 0, "Positive LFC", "Negative LFC"),
+                  color = ifelse(passed_ss_DietVeg == 1, "aquamarine3", "black"))
+df_fig_Diet$taxon = factor(df_fig_Diet$taxon, levels = df_fig_Diet$taxon)
+df_fig_Diet$direct = factor(df_fig_Diet$direct, 
+                           levels = c("Positive LFC", "Negative LFC"))
+  
+fig_Diet = df_fig_Diet %>%
+    ggplot(aes(x = taxon, y = lfc_DietVeg, fill = direct)) + 
+    geom_bar(stat = "identity", width = 0.7, color = "black", 
+             position = position_dodge(width = 0.4)) +
+    geom_errorbar(aes(ymin = lfc_DietVeg - se_DietVeg, ymax = lfc_DietVeg + se_DietVeg), 
+                  width = 0.2, position = position_dodge(0.05), color = "black") + 
+    labs(x = NULL, y = "Log fold change", 
+         title = "Log fold changes between Dietary groups") + 
+    scale_fill_discrete(name = NULL) +
+    scale_color_discrete(name = NULL) +
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5),
+          panel.grid.minor.y = element_blank(),
+          axis.text.x = element_text(angle = 60, hjust = 1,
+                                     color = df_fig_Diet$color))
+```
+
+
+
+## Sex for using ANCOM-BC2
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Genus",
+                             prevalence = 0 / 100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for location
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Sex",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 0,
+                         group = "Sex",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         # multi group comparison is deactivated automatically
+                         global = TRUE)
+ancombc2_out$res %>%
+  dplyr::select(taxon, lfc_SexMale,  q_SexMale) %>%
+  filter(q_SexMale < 0.05) %>%
+  arrange(q_SexMale) %>%
+  head() %>%
+  knitr::kable()
+
+#Structural zeros (taxon presence/absence)
+tab_zero = ancombc2_out$zero_ind
+tab_zero %>%
+    datatable(caption = "The detection of structural zeros")
+
+#ANCOM-BC2 primary analysis
+res_prim = ancombc2_out$res
+df_Sex = res_prim
+#df_Location = res_prim %>% dplyr::select(taxon, ends_with("Location")) 
+df_fig_Sex = df_Sex %>%
+    dplyr::filter(diff_SexMale == 1) %>% 
+    dplyr::arrange(desc(lfc_SexMale)) %>%
+    dplyr::mutate(direct = ifelse(lfc_SexMale > 0, "Positive LFC", "Negative LFC"),
+                  color = ifelse(passed_ss_SexMale == 1, "aquamarine3", "black"))
+df_fig_Sex$taxon = factor(df_fig_Sex$taxon, levels = df_fig_Sex$taxon)
+df_fig_Sex$direct = factor(df_fig_Sex$direct, 
+                           levels = c("Positive LFC", "Negative LFC"))
+  
+fig_Sex = df_fig_Sex %>%
+    ggplot(aes(x = taxon, y = lfc_SexMale, fill = direct)) + 
+    geom_bar(stat = "identity", width = 0.7, color = "black", 
+             position = position_dodge(width = 0.4)) +
+    geom_errorbar(aes(ymin = lfc_SexMale - se_SexMale, ymax = lfc_SexMale + se_SexMale), 
+                  width = 0.2, position = position_dodge(0.05), color = "black") + 
+    labs(x = NULL, y = "Log fold change", 
+         title = "Log fold changes between sex") + 
+    scale_fill_discrete(name = NULL) +
+    scale_color_discrete(name = NULL) +
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5),
+          panel.grid.minor.y = element_blank(),
+          axis.text.x = element_text(angle = 60, hjust = 1,
+                                     color = df_fig_Sex$color))
+```
+
+
+Age
+
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Genus",
+                             prevalence = 0 / 100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for location
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Age",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1,
+                         group = "Age",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         # multi group comparison is deactivated automatically
+                         global = TRUE)
+#ancombc2_out$res %>%
+#  dplyr::select(taxon, lfc_SexMale,  q_SexMale) %>%
+#  filter(q_SexMale < 0.05) %>%
+#  arrange(q_SexMale) %>%
+#  head() %>%
+#  knitr::kable()
+
+#Structural zeros (taxon presence/absence)
+#tab_zero = ancombc2_out$zero_ind
+#tab_zero %>%
+#    datatable(caption = "The detection of structural zeros")
+
+#ANCOM-BC2 primary analysis
+res_prim = ancombc2_out$res
+df_Age = res_prim
+
+#AGE
+df_Age = res_prim %>%
+    dplyr::select(taxon, contains("Age")) 
+
+df_fig_Age1 = df_Age %>%
+    dplyr::filter(diff_AgeElderly == 1 | 
+                    diff_AgeMiddle_age == 1) %>%
+    dplyr::mutate(lfc1 = ifelse(diff_AgeMiddle_age == 1, 
+                                round(lfc_AgeMiddle_age, 2), 0),
+                  lfc2 = ifelse(diff_AgeElderly == 1, 
+                                round(lfc_AgeElderly, 2), 0)) %>%
+    tidyr::pivot_longer(cols = lfc1:lfc2, 
+                        names_to = "group", values_to = "value") %>%
+    dplyr::arrange(taxon)
+
+df_fig_Age2 = df_Age %>%
+    dplyr::filter(diff_AgeElderly == 1 | 
+                    diff_AgeMiddle_age == 1) %>%
+    dplyr::mutate(lfc1 = ifelse(passed_ss_AgeElderly == 1 & diff_AgeElderly == 1, 
+                                "aquamarine3", "black"),
+                  lfc2 = ifelse(passed_ss_AgeMiddle_age == 1 & diff_AgeMiddle_age == 1, 
+                                "aquamarine3", "black")) %>%
+    tidyr::pivot_longer(cols = lfc1:lfc2, 
+                        names_to = "group", values_to = "color") %>%
+    dplyr::arrange(taxon)
+
+df_fig_Age = df_fig_Age1 %>%
+    dplyr::left_join(df_fig_Age2, by = c("taxon", "group"))
+
+df_fig_Age$group = recode(df_fig_Age$group, 
+                          `lfc1` = "AgeMiddle_age - Adult",
+                          `lfc2` = "AgeElderly - Adult")
+df_fig_Age$group = factor(df_fig_Age$group, 
+                          levels = c("AgeMiddle_age - Adult",
+                                     "AgeElderly - Adult"))
+  
+lo = floor(min(df_fig_Age$value))
+up = ceiling(max(df_fig_Age$value))
+mid = (lo + up)/2
+fig_Age = df_fig_Age %>%
+  ggplot(aes(x = group, y = taxon, fill = value)) + 
+  geom_tile(color = "black") +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                       na.value = "white", midpoint = mid, limit = c(lo, up),
+                       name = NULL) +
+  geom_text(aes(group, taxon, label = value, color = color), size = 4) +
+  scale_color_identity(guide = FALSE) +
+  labs(x = NULL, y = NULL, title = "Log fold changes as compared to Adult subjects") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+fig_Age
+```
+
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Family",
+                             prevalence = 0 / 100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for family
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Family",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1,
+                         group = "Family",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         # multi group comparison is deactivated automatically
+                         global = TRUE,
+                         pairwise = TRUE)
+
+ancombc2_out$res %>%
+  dplyr::select(taxon, starts_with("lfc_") | starts_with("q_")) %>% 
+  filter(q_FamilyB < 0.05 | q_FamilyC < 0.05 | q_FamilyD < 0.05 | q_FamilyE < 0.05| q_FamilyF < 0.05 | q_FamilyG < 0.05|q_FamilyH < 0.05| q_FamilyI < 0.05 |q_FamilyJ < 0.05| q_FamilyK < 0.05| q_FamilyL < 0.05| q_FamilyM < 0.05| q_FamilyN < 0.05| q_FamilyO < 0.05) %>%
+  head() %>%
+  knitr::kable()
+
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Family")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Family %in% "Bacillaceae"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+library(FSA)
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else 
+
+## for Corynebacteriaceae
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Family")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Family %in% "Corynebacteriaceae"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+library(FSA)
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else   
+  
+## for Staphylococcaceae
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Family")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Family %in% "Staphylococcaceae"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+library(FSA)
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else     
+  
+  
+## for Pseudomonadaceae_2
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Family")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Family %in% "Pseudomonadaceae"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+library(FSA)
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else 
+  
+## for Enterobacteriaceae
+tse <- subsetByPrevalentFeatures(fam_tse, rank = "Family")
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+tse_subset_by_feature <- tse[rowData(tse)$Family %in% "Enterobacteriaceae"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+library(FSA)
+
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+if (kw_result$p.value < 0.05) {
+  # Kruskal-Wallis test is significant, proceed with Dunn's test
+  dunn_result <- dunnTest(molten_tse$relabundance, molten_tse$Family.y, method = "bonferroni")
+  print(dunn_result)
+} else 
+```
+
+## DAA for location using ANCOM-BC2 ######## 13/3/24
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Genus",
+                             prevalence = 0 / 100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for location
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "G",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1,
+                         group = "G",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         # multi group comparison is deactivated automatically
+                         global = TRUE)
+ancombc2_out$res %>%
+  dplyr::select(taxon, lfc_LocationPune,  q_LocationPune) %>%
+  filter(q_LocationPune < 0.05) %>%
+  arrange(q_LocationPune) %>%
+  head() %>%
+  knitr::kable()
+
+#Structural zeros (taxon presence/absence)
+tab_zero = ancombc2_out$zero_ind
+tab_zero %>%
+    datatable(caption = "The detection of structural zeros")
+
+#ANCOM-BC2 primary analysis
+res_prim = ancombc2_out$res
+df_Location = res_prim
+#df_Location = res_prim %>% dplyr::select(taxon, ends_with("Location")) 
+df_fig_Location = df_Location %>%
+    dplyr::filter(diff_LocationPune == 1) %>% 
+    dplyr::arrange(desc(lfc_LocationPune)) %>%
+    dplyr::mutate(direct = ifelse(lfc_LocationPune > 0, "Positive LFC", "Negative LFC"),
+                  color = ifelse(passed_ss_LocationPune == 1, "aquamarine3", "black"))
+df_fig_Location$taxon = factor(df_fig_Location$taxon, levels = df_fig_Location$taxon)
+df_fig_Location$direct = factor(df_fig_Location$direct, 
+                           levels = c("Positive LFC", "Negative LFC"))
+  
+fig_Location = df_fig_Location %>%
+    ggplot(aes(x = taxon, y = lfc_LocationPune, fill = direct)) + 
+    geom_bar(stat = "identity", width = 0.7, color = "black", 
+             position = position_dodge(width = 0.4)) +
+    geom_errorbar(aes(ymin = lfc_LocationPune - se_LocationPune, ymax = lfc_LocationPune + se_LocationPune), 
+                  width = 0.2, position = position_dodge(0.05), color = "black") + 
+    labs(x = NULL, y = "Log fold change", 
+         title = "Log fold changes between two Locations") + 
+    scale_fill_discrete(name = NULL) +
+    scale_color_discrete(name = NULL) +
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5),
+          panel.grid.minor.y = element_blank(),
+          axis.text.x = element_text(angle = 60, hjust = 0.5,
+                                     color = df_fig_Location$color)) + theme(axis.text.x=element_text(colour="black"))
+
+fig_Location
+```

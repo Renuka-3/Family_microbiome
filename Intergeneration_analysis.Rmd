@@ -24,7 +24,6 @@ di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
 tse1 <- tse[ , tse$G %in% "G1"]
 tse1 <- tse1[,!(colnames(tse1) %in% c("C2", "G2", "H2", "I2", "J2", "O2", "O3","O4"))]
 
-
 # subsetting and filtering data for g2 members
 tse2 <- tse[ , tse$G %in% "G2"]
 tse3 <- tse2[ , tse2$Sex %in% "Male"]
@@ -156,7 +155,7 @@ b <- ggplot(mergedcities1, aes(x=grp1,y=value1))+
     geom_boxplot(outlier.shape = NA)+
     geom_jitter(aes(colour = City), width= 0.05, size= 1.7) +
     #geom_signif(comparisons = list(c("within_pairs", "between_pairs"))) + theme(text = element_text(size = 10)) + 
-  labs(x = "", y= "Bray-Curtis index", title = "B. G2-G3 comparision") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
+  labs(x = "", y= "Bray-Curtis index", title = "B. G2-G3 comparison") + scale_x_discrete(labels=c("within_pairs" = "Within family", "between_pairs" = "Between family")) + theme_bw(base_size = 20) + theme(legend.position = "none")
 #print(b)
 ```
 
@@ -164,14 +163,6 @@ b <- ggplot(mergedcities1, aes(x=grp1,y=value1))+
 # G1-G3 (location, gender matched)
 
 ```{r g1g3, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-library(ggsignif)
-library(mia)
-library(vegan)
-library(scater)
-library(dplyr)
-library(tidyverse)
-library(magrittr)
-
 tse <- readRDS("data/fam_tse.rds")
 di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
 di <- reshape2::melt(di) %>% `colnames<-`(c("X","Y", "value"))
@@ -240,12 +231,6 @@ c <- ggplot(mergedcities2, aes(x=grp2,y=value2))+
 # Father-child location-wise
 
 ```{r FC, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-library(mia)
-library(vegan)
-library(scater)
-library(dplyr)
-library(tidyverse)
-library(ggsignif)
 
 tse <- readRDS("data/fam_tse.rds")
 di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
@@ -320,12 +305,6 @@ E <- ggplot(mergedcities3, aes(x=grp3,y=value3))+
 # Mother-child (genetic relatedness) with location
 
 ```{r MC, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-library(mia)
-library(vegan)
-library(scater)
-library(dplyr)
-library(tidyverse)
-library(ggsignif)
 
 tse <- readRDS("data/fam_tse.rds")
 di <- as.matrix(vegdist(t(assay(tse, "counts")), method="bray"))
@@ -398,7 +377,7 @@ L <- ggplot(mergedcities4, aes(x=grp4,y=value4))+
 ```
 
 
-# Mother-child and father-child comparisons within family 
+# Parent-child within family 
 
 ```{r g2g3MF, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 library(mia)

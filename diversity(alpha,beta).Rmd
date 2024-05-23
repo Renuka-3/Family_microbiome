@@ -1,0 +1,313 @@
+---
+title: "Tse_alpha"
+author: "Renuka"
+date: "2023-03-13"
+output: html_document
+---
+
+
+## Alpha diversity analysis for confounding factors 
+
+```{r beta, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(mia)
+library(vegan)
+library(ggplot2)
+library(scater)
+library(ggrepel)
+library(gridExtra)
+library(vegan)
+library(patchwork)
+library(ggsignif)
+library(ggpubr)
+library(knitr)
+library(stringr)
+```
+
+```{r alpha, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+fam_tse <- readRDS("data/fam_tse.rds")
+#Alpha diversity measures
+tse <- mia::estimateDiversity(fam_tse, 
+                              assay_name = "counts",
+                              index = "shannon", 
+                              name = "shannon")
+#head(colData(tse)$shannon)
+
+
+df <- as.data.frame(colData(tse))
+b <- ggplot(df, aes(x = Location, y = shannon)) +    ## Shannon Diversity for Geographical_location
+geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(width = 0.05) + 
+  labs(y= "Shannon index", x= "", title = "A. Location") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 15)) + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 2.2,label = "0.08")
+
+d <- ggplot(df, aes(x = Diet, y = shannon)) +    ## Shannon Diversity for diet
+geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(width = 0.05) + 
+  labs(y = "Shannon index", x = "", title = "B.Diet") + theme_bw() +  scale_x_discrete(labels=c("Mixed" = "Mixed", "Veg" = "Vegetarian")) + theme(text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 15)) +geom_bracket(xmin = "Mixed", xmax= "Veg", y.position = 2.2,label = "0.08")  
+
+
+c <- ggplot(df, aes(x = Age, y = shannon)) +    ## Shannon Diversity for age groups
+geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(width = 0.05) +  labs(y = "Shannon index", x = "", title = "C. Age") + theme_bw() + scale_x_discrete(limits = c("Adult","Middle_age", "Elderly"), labels = c("Adult", "Middle age", "Elderly")) +
+  theme(text = element_text(size = 20), axis.text = element_text(size = 13), axis.title = element_text(size = 15)) + geom_signif(comparisons = list(c("Adult", "Middle_age"), c("Adult","Elderly"), c("Middle_age", "Elderly")), map_signif_level = FALSE, na.rm = TRUE) 
+
+
+e <- ggplot(df, aes(x = Sex, y = shannon)) +    ## Shannon Diversity for sex
+geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(width = 0.05) + 
+ labs(y = "Shannon index", x = "", title = "D. Sex") + theme_bw() + theme(text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 16)) + geom_bracket(xmin = "Female", xmax= "Male", y.position = 2.2,label = "0.73") #+ geom_signif(comparisons = list(c("Female", "Male")), map_signif_level = FALSE, na.rm = FALSE) 
+
+## Multiple pairwise comparison for all co-factors
+m <- c()
+l <- df
+m[["Diet"]] <- kruskal.test(data = l, shannon ~ factor(Diet))$p.value
+m[["Location"]] <- kruskal.test(data = l, shannon ~ factor(Location))$p.value
+m[["Sex"]] <- kruskal.test(data = l, shannon ~ factor(Sex))$p.value
+m[["Age"]] <- kruskal.test(data = l, shannon ~ factor(Age))$p.value
+p.adjust(m, method="fdr")
+
+
+gridExtra::grid.arrange(b, d, c, e, nrow = 1, widths= c(10,10,13,10))
+```
+
+## Beta diversity analysis for confounding factors
+
+
+```{r b, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+fam_tse <- readRDS("data/fam_tse.rds")
+tse <- transformCounts(fam_tse, method = "relabundance")
+
+# Quantify dissimilarities in the original feature space
+
+x <- assay(tse, "relabundance") # Pick relabunance assay separately
+d0 <- as.matrix(vegdist(t(x), "bray"))
+# PCoA Ordination
+pcoa <- as.data.frame(cmdscale(d0, k = 2))
+names(pcoa) <- c("PCoA1", "PCoA2")
+# Quantify dissimilarities in the ordination space
+dp <- as.matrix(dist(pcoa))
+# Calculate stress i.e. relative difference in the original and
+# projected dissimilarities
+stress <- sum((dp - d0)^2)/sum(d0^2)
+ord <- order(as.vector(d0))
+df <- data.frame(d0 = as.vector(d0)[ord],
+                  dmds = as.vector(dp)[ord])
+i<- ggplot(aes(x = d0, y = dmds), data=df) + 
+       geom_smooth() +
+       geom_point() +       
+       labs(title = "Shepard plot",
+       x = "Original distance",
+       y = "MDS distance",       
+            subtitle = paste("Stress:", round(stress, 2))) +
+  theme_bw()
+
+#library(scater)
+tse <- transformSamples(tse, method = "relabundance")
+tse <- runMDS(tse, FUN = vegan::vegdist, method = "bray", name = "PCoA_BC", exprs_values = "relabundance")
+
+# Create ggplot object for location 
+p <- plotReducedDim(tse, "PCoA_BC", colour_by = "Location", point_size= 3, shape_by = "G")
+#p <- plotReducedDim(tse, "PCoA_BC", colour_by = "Family")
+# Add explained variance for each axis
+e <- attr(reducedDim(tse, "PCoA_BC"), "eig");
+rel_eig <- e/sum(e[e>0])          
+p <- p + labs(x = paste("PCoA 1 (", round(100 * rel_eig[[1]],1), "%", ")", sep = ""),
+              y = paste("PCoA 2 (", round(100 * rel_eig[[2]],1), "%", ")", sep = ""), title= "B. Location") + 
+   theme(legend.text=element_text(size=15)) + theme(axis.text.x = element_text(size=15), axis.text.y = element_text(size = 15)) + theme(axis.title = element_text(size = 15), plot.title = element_text(size = 20))
+p1 <- p + scale_fill_manual(values=c(Pune = "#0072B2", Ahmednagar = "#D55E00"), aesthetics="colour") + labs(color= "Location", shape_by= "Generation") + theme(legend.title = element_text(size=13), legend.text = element_text(size = 10))
+
+
+
+# Create ggplot object for Family
+p4 <- plotReducedDim(tse, "PCoA_BC", colour_by = "Family", point_size= 3, shape_by = "G") 
+e <- attr(reducedDim(tse, "PCoA_BC"), "eig");
+rel_eig <- e/sum(e[e>0])          
+p4 <- p4 + labs(x = paste("PCoA 1 (", round(100 * rel_eig[[1]],1), "%", ")", sep = ""),
+              y = paste("PCoA 2 (", round(100 * rel_eig[[2]],1), "%", ")", sep = ""), title= "A. Family") +
+ theme(legend.text=element_text(size=15)) + labs(colour = "Family", shape = "Generation") + theme(axis.text.x = element_text(size=15), axis.text.y = element_text(size = 15)) + theme(axis.title = element_text(size = 15), plot.title = element_text(size = 20)) + theme(legend.box.spacing = unit(5, "pt"), legend.margin=margin(0,0,0,0),legend.title = element_text(size=12), legend.text = element_text(size = 10)) 
+
+p5 <- p4 + scale_fill_manual(values=c(A = "black", B = "#E7B800", C = "royalblue4", D = "darkcyan", E = "grey", F ="red", G="green", H= "sandybrown", I = "yellow", J = "purple", K= "brown", L = "magenta2", M ="salmon2", N= "olivedrab4", O= "sienna"), aesthetics="colour")  + labs(colour = "Family", shape = "Generation")          
+
+library(gridExtra)
+library(ggpubr)
+gridExtra::grid.arrange(p5, p1, ncol = 2, widths=c(0.5, 0.5), heights = c(10, 4))
+
+
+## PERMANOVA analysis
+library("vegan")
+fam_tse <- readRDS("data/fam_tse.rds")
+tse <- transformSamples(fam_tse, method = "relabundance")
+# Agglomerate data to Species level
+tse <- agglomerateByRank(tse, rank = "Genus")
+# Set seed for reproducibility
+
+set.seed(413)
+temp <- anova(
+    betadisper( 
+        vegdist(t(assay(tse,"relabundance")), method = "bray"),
+        group = colData(tse)[,"Location"]))
+
+
+
+set.seed(1576)
+
+# We choose 999 random permutations
+permanova <- adonis2(t(assay(tse,"relabundance")) ~  Diet + Age + Family + Sex + Location,
+                     by = "margin", 
+                     data = colData(tse),
+                     method = "bray",
+                     permutations = 999)
+head(permanova)
+```
+
+
+## dbRDA flr confounding factors
+
+```{r DBRDA, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+#data(enterotype, package="mia")
+# Covariates that are being analyzed
+variable_names <- c("Location", "Diet", "Sex", "Age")
+
+# Apply relative transform
+tse <- transformCounts(fam_tse, method = "relabundance")
+
+# Create a formula
+formula <- as.formula(paste0("assay ~ ", str_c(variable_names, collapse = " + ")) )
+
+# # Perform RDA
+rda <- calculateRDA(tse, assay_name = "relabundance",
+                    formula = formula, distance = "bray", na.action = na.exclude)
+# Get the rda object
+rda <- attr(rda, "rda")
+# Calculate p-value and variance for whole model
+# Recommendation: use 999 permutations instead of 99
+set.seed(436)
+permanova <- anova.cca(rda, permutations = 99)
+# Create a data.frame for results
+rda_info <- as.data.frame(permanova)["Model", ]
+
+# Calculate p-value and variance for each variable
+# by = "margin" --> the order or variables does not matter
+set.seed(4585)
+permanova <- anova.cca(rda, by = "margin",  permutations = 99)
+# Add results to data.frame
+rda_info <- rbind(rda_info, permanova)
+
+# Add info about total variance
+rda_info[ , "Total variance"] <- rda_info["Model", 2] +
+    rda_info["Residual", 2]
+
+# Add info about explained variance
+rda_info[ , "Explained variance"] <- rda_info[ , 2] / 
+    rda_info[ , "Total variance"]
+
+# Loop through variables, calculate homogeneity
+homogeneity <- list()
+# Get colDtaa
+coldata <- colData(tse)
+# Get assay
+assay <- t(assay(tse, "relabundance"))
+for( variable_name in rownames(rda_info) ){
+    # If data is continuous or discrete
+    if( variable_name %in% c("Model", "Residual") ||
+        length(unique(coldata[[variable_name]])) /
+        length(coldata[[variable_name]]) > 0.2 ){
+        # Do not calculate homogeneity for continuous data
+        temp <- NA
+    } else{
+        # Calculate homogeneity for discrete data
+        # Calculate homogeneity
+        set.seed(413)
+        temp <- anova(
+            betadisper( 
+                vegdist(assay, method = "bray"),
+                group = coldata[[variable_name]] ),
+            permutations = permutations )["Groups", "Pr(>F)"]
+    }
+    # Add info to the list
+    homogeneity[[variable_name]] <- temp
+}
+# Add homogeneity to information
+rda_info[["Homogeneity p-value (NULL hyp: distinct/homogeneous --> permanova suitable)"]] <-
+    homogeneity
+
+kable(rda_info)
+library("devtools")
+library("ggord")
+
+# Load ggord for plotting
+#if(!require("ggord")){
+#    if(!require("devtools")){
+#        install.packages("devtools")
+#        library("devtools")
+#    }
+#    install_github("https://github.com/fawda123/ggord/")
+#    library("ggord")
+#}
+#if(!require("ggplot2")){
+#    install.packages("ggplot2")
+#    library("ggplot2")
+#}
+
+library(ggplot2)
+library(ggord)
+# Since na.exclude was used, if there were rows missing information, they were 
+# dropped off. Subset coldata so that it matches with rda.
+coldata <- coldata[ rownames(rda$CCA$wa), ]
+
+# Adjust names
+# Get labels of vectors
+vec_lab_old <- rownames(rda$CCA$biplot)
+library(rlang)
+# Loop through vector labels
+vec_lab <- sapply(vec_lab_old, FUN = function(name){
+    # Get the variable name
+    variable_name <- variable_names[ str_detect(name, variable_names) ]
+    # If the vector label includes also group name
+    if( !any(name %in% variable_names) ){
+        # Get the group names
+        group_name <- unique( coldata[[variable_name]] )[ 
+        which( paste0(variable_name, unique( coldata[[variable_name]] )) == name ) ]
+        # Modify vector so that group is separated from variable name
+        new_name <- paste0(variable_name, " \U2012 ", group_name)
+    } else{
+        new_name <- name
+    }
+    # Add percentage how much this variable explains, and p-value
+    new_name <- expr(paste(!!new_name, " (", 
+                           !!format(round( rda_info[variable_name, "Explained variance"]*100, 1), nsmall = 1), 
+                           "%, ",italic("P"), " = ", 
+                           !!gsub("0\\.","\\.", format(round( rda_info[variable_name, "Pr(>F)"], 3), 
+                                                       nsmall = 3)), ")"))
+
+    return(new_name)
+})
+# Add names
+names(vec_lab) <- vec_lab_old
+
+# Create labels for axis
+xlab <- paste0("RDA1 (", format(round( rda$CCA$eig[[1]]/rda$CCA$tot.chi*100, 1), nsmall = 1 ), "%)")
+ylab <- paste0("RDA2 (", format(round( rda$CCA$eig[[2]]/rda$CCA$tot.chi*100, 1), nsmall = 1 ), "%)")
+
+# Create a plot        
+plot <- ggord(rda, grp_in = coldata[["Location"]], vec_lab = vec_lab,
+              alpha = 0.5,
+              size = 4, addsize = -4,
+              #ext= 0.7, 
+              txt = 3.5, repel = TRUE, 
+              #coord_fix = FALSE
+          ) + 
+    # Adjust titles and labels
+    guides(colour = guide_legend("Location"),
+           fill = guide_legend("Location"),
+           group = guide_legend("Location"),
+           shape = guide_legend("Location"),
+           x = guide_axis(xlab),
+           y = guide_axis(ylab)) +
+    theme( axis.title = element_text(size = 10) )
+plot
+```
+
+
+

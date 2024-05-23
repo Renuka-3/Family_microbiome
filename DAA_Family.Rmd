@@ -1,0 +1,112 @@
+---
+title: "Untitled"
+author: "Renuka"
+date: "2024-04-10"
+output: html_document
+---
+
+
+## DAA for family using ANCOM-BC2, prevl cut off 1/100
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+library(ggpubr)
+library(ggplotify)
+library(ggplot2)
+library(broom)
+library(FSA)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Genus",
+                             prevalence = 1/100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for location
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Family",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1/100,
+                         group = "Family",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         global = TRUE)
+res <- ancombc2_out$res %>%
+    dplyr::select(taxon, lfc_FamilyB,  q_FamilyB) %>%
+  filter(q_FamilyB < 0.05) %>%
+  arrange(q_FamilyB)
+head(res)
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Staphylococcus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+renu <- dunnTest(relabundance ~ Family.y, data=molten_tse, method = "bh", list= TRUE)
+#dunn.results <- re
+#stat.test <- re$res
+
+
+z1 <- ggplot(molten_tse, aes(x = Family.y, y = relabundance)) + labs(x= "Family",  y = "Relative abundance (%)", title = "Staphylococcus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0, size = 1.5) + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 18), axis.text = element_text(size = 13), axis.title = element_text(size = 15)) + scale_y_continuous(label=scales::percent) + geom_bracket(xmin = "B", xmax= "H", y.position = 1.0,label = "0.05") + geom_bracket(xmin = "D", xmax= "H", y.position = 1.05 ,label = "0.04") + geom_bracket(xmin = "E", xmax= "H", y.position = 1.1, label = "0.02") + geom_bracket(xmin = "E", xmax= "I", y.position = 1.15, label = "0.05") 
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Bacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse1)
+res <- dunnTest(relabundance ~ Family.y, data=molten_tse, method = "bh", list= TRUE)
+dunn.results <- res
+z2 <- ggplot(molten_tse, aes(x = Family.y, y = relabundance)) + labs(x= "Family",  y = "Relative abundance (%)", title = "Bacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0, size = 1.5) + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 18), axis.text = element_text(size = 13), axis.title = element_text(size = 15)) + scale_y_continuous(label=scales::percent) + geom_bracket(xmin = "A", xmax= "C", y.position = 0.82,label = "0.02") + geom_bracket(xmin = "C", xmax= "E", y.position = 0.86 ,label = "0.01") + geom_bracket(xmin = "A", xmax= "F", y.position = 0.92, label = "0.01") + geom_bracket(xmin = "E", xmax= "F", y.position = 0.95, label = "0.01") + geom_bracket(xmin = "E", xmax= "I", y.position = 0.98, label = "0.02")+ geom_bracket(xmin = "C", xmax= "K", y.position = 1.0, label = "0.01")+ geom_bracket(xmin = "F", xmax= "K", y.position = 1.03, label = "0.02")+ geom_bracket(xmin = "A", xmax= "L", y.position = 1.05, label = "0.04")+ geom_bracket(xmin = "E", xmax= "L", y.position = 1.08, label = "0.01")+ geom_bracket(xmin = "A", xmax= "N", y.position = 1.11, label = "0.01")+ geom_bracket(xmin = "E", xmax= "N", y.position = 1.14, label = "0.006")+ geom_bracket(xmin = "K", xmax= "N", y.position = 1.17, label = "0.01") + geom_bracket(xmin = "E", xmax= "O", y.position = 1.20, label = "0.01")
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Corynebacterium"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse)
+renu <- dunnTest(relabundance ~ Family.y, data=molten_tse, method = "bh", list= TRUE)
+dunn.results <- re
+z3 <- ggplot(molten_tse, aes(x = Family.y, y = relabundance)) + labs(x= "Family",  y = "Relative abundance (%)", title = "Corynebacterium") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0, size = 1.5) + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 18), axis.text = element_text(size = 13), axis.title = element_text(size = 15)) + scale_y_continuous(label=scales::percent) + geom_bracket(xmin = "A", xmax= "C", y.position = 1.0,label = "0.02") + geom_bracket(xmin = "C", xmax= "E", y.position = 1.1 ,label = "0.01") + geom_bracket(xmin = "A", xmax= "F", y.position = 1.0, label = "0.01") + geom_bracket(xmin = "E", xmax= "F", y.position = 1.0, label = "0.01") + geom_bracket(xmin = "E", xmax= "I", y.position = 1.02, label = "0.02")+ geom_bracket(xmin = "C", xmax= "K", y.position = 1.05, label = "0.01")+ geom_bracket(xmin = "E", xmax= "L", y.position = 1.03, label = "0.01")+ geom_bracket(xmin = "A", xmax= "N", y.position = 1.08, label = "0.01")+ geom_bracket(xmin = "E", xmax= "N", y.position = 1.12, label = "0.006")+ geom_bracket(xmin = "K", xmax= "N", y.position = 1.15, label = "0.01")+ geom_bracket(xmin = "A", xmax= "O", y.position = 1.17, label = "0.06")+ geom_bracket(xmin = "E", xmax= "O", y.position = 1.17, label = "0.01")
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Anaerococcus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse1)
+res <- dunnTest(relabundance ~ Family.y, data=molten_tse, method = "bh", list= TRUE)
+dunn.results <- res
+z4 <- ggplot(molten_tse, aes(x = Family.y, y = relabundance)) + labs(x= "Family",  y = "Relative abundance (%)", title = "Anaerococcus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0, size = 1.5) + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 18), axis.text = element_text(size = 13), axis.title = element_text(size = 15)) + scale_y_continuous(label=scales::percent) + geom_bracket(xmin = "B", xmax= "C", y.position = 0.40,label = "0.05") + geom_bracket(xmin = "B", xmax= "D", y.position = 0.45 ,label = "0.01") + geom_bracket(xmin = "B", xmax= "E", y.position = 0.50, label = "0.01") + geom_bracket(xmin = "B", xmax= "F", y.position = 0.55, label = "0.02") + geom_bracket(xmin = "B", xmax= "H", y.position = 0.60, label = "0.02")+ geom_bracket(xmin = "E", xmax= "L", y.position = 0.65, label = "0.05")+ geom_bracket(xmin = "D", xmax= "M", y.position = 0.70, label = "0.02")+ geom_bracket(xmin = "E", xmax= "M", y.position = 0.75, label = "0.03")+ geom_bracket(xmin = "F", xmax= "M", y.position = 0.80, label = "0.05")
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Klebsiella"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Family.y, data = molten_tse1)
+res <- dunnTest(relabundance ~ Family.y, data=molten_tse, method = "bh", list= TRUE)
+dunn.results <- res
+z5 <- ggplot(molten_tse, aes(x = Family.y, y = relabundance)) + labs(x= "Family",  y = "Relative abundance (%)", title = "Klebsiella") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0, size = 1.5) + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 18), axis.text = element_text(size = 13), axis.title = element_text(size = 15)) + scale_y_continuous(label=scales::percent) + geom_bracket(xmin = "A", xmax= "B", y.position = 0.75,label = "0.05")
+
+
+library(gridExtra)
+library(ggpubr)
+gridExtra::grid.arrange(z1, z2, z3, z4, z5, ncol=2)
+```

@@ -1,0 +1,274 @@
+---
+title: "DAA_location"
+author: "Renuka"
+date: "2024-03-23"
+output: html_document
+---
+## DAA for location using ANCOM-BC2
+
+```{r daa,echo=FALSE, message=FALSE, warning=FALSE, error=FALSE }
+library(mia)
+library(vegan)
+library(knitr)
+library(stringr)
+library(tidyverse)
+library(DT)
+library(ANCOMBC)
+library(ggpubr)
+library(ggplotify)
+library(ggplot2)
+library(broom)
+# Load data
+fam_tse <- readRDS("data/fam_tse.rds")
+
+# Agglomerate by genus and subset by prevalence
+tse <- subsetByPrevalentFeatures(fam_tse,
+                             rank = "Genus",
+                             prevalence = 1/100)
+
+tse <- transformAssay(tse,
+                      assay.type = "counts",
+                      method = "relabundance")
+
+# ANCOM-BC2 for location
+ancombc2_out <- ancombc2(data = tse,
+                         assay.type = "counts",
+                         fix_formula = "Location",
+                         tax_level = "Genus",
+                         p_adj_method = "fdr",
+                         prv_cut = 1/100,
+                         group = "Location",
+                         struc_zero = TRUE,
+                         neg_lb = TRUE,
+                         global = TRUE)
+res <- ancombc2_out$res %>%
+  dplyr::select(taxon, lfc_LocationPune,  q_LocationPune) %>%
+  filter(q_LocationPune < 0.05) %>%
+  arrange(q_LocationPune)
+head(res)
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Staphylococcus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l1 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Staphylococcus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 1.1,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Bacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l27 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Bacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 1.1,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Xanthomonas"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l2 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Xanthomonas") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.0005,label = "0.05") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Jeotgalibacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l3 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Jeotgalibacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.00005,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Amycolatopsis"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l4 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Amycolatopsis") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.00005,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Komagataeibacter"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l6 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Komagataeibacter") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.00005,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Novispirillum"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l7 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Novispirillum") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.00005,label = "0.01") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Tuberibacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l8 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Tuberibacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.00004,label = "0.04") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Nesterenkonia"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l9 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Nesterenkonia") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.00005,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Terribacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l10 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Terribacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.00006,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Sporosarcina"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l12 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Sporosarcina") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.0002,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Lentibacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l13 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Lentibacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.000065,label = "0.02") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Geothrix"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l14 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Geothrix") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.00004,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Dietzia"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l15 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Dietzia") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.0002,label = "0.01") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Planococcus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l16 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Planococcus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.0002,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Gracilibacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l17 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Gracilibacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.00010,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Geobacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l18 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Geobacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.0002,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Ornithinibacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l19 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Ornithinibacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.0002,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Oceanobacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l20 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Oceanobacillus") +  geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.0008,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Domibacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l21 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Domibacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.0001,label = "0.04") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+       
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Paracoccus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l22 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Paracoccus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.005,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Paenibacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l23 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Ornithinibacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.1,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Virgibacillus"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l24 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Virgibacillus") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.0010,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Brachybacterium"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l25 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Brachybacterium") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.002,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+
+tse_subset_by_feature <- tse[rowData(tse)$Genus %in% "Stenotrophomonas"]
+molten_tse <-  mia::meltAssay(tse_subset_by_feature,
+                        add_row_data = TRUE,
+                        add_col_data = TRUE,
+                        assay.type = "relabundance")
+kw_result <- kruskal.test(relabundance ~ Location, data = molten_tse)
+l26 <- ggplot(molten_tse, aes(x = Location, y = relabundance)) + labs(x= "Location",  y = "Relative abundance (%)", title = "Stenotrophomonas") + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.08, size = 2)  + geom_bracket(xmin = "Pune", xmax= "Ahmednagar", y.position = 0.002,label = "0.00") + theme_bw() +theme(plot.title = element_text(face = "italic"), text = element_text(size = 20), axis.text = element_text(size = 15), axis.title = element_text(size = 18)) + scale_y_continuous(label=scales::percent)
+
+library(gridExtra)
+library(ggpubr)
+gridExtra::grid.arrange(l2, l3, l4, l6, l7, l8, l9 ,l10, l12, l13, l14, l15, l16, l17, l18, l19, l20, l21, l22, l23, l24, l25, l26, ncol=4)
+gridExtra::grid.arrange(l1, l27, nrow=2)
+```

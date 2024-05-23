@@ -5,7 +5,7 @@ date: "2023-09-25"
 output: html_document
 ---
 
-
+## Suplementary figure 3
 
 ```{r g1g3, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 library("mia")
