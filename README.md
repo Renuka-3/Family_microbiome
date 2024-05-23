@@ -41,12 +41,13 @@ To start running the respective analysis first create the TSE object and then us
 rmarkdown::render("FILENAME.Rmd", output_format="md_document")
 ```
 
-- [Alpha diversity analysis](tse_alpha.Rmd) | [Figure 2](tse_alpha.md): alpha diversity estimated using Shannon diversity index for all co-factors. 
-- [Beta diversity analysis](tse_beta.Rmd) | [Figure 3](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
-- [dbRDA](RDA.Rmd) | [Figure 4](RDA.md): distance-based Redundancy analysis performed for confounding factors.
-- [most prevalent microbiome](tse_core.Rmd) | [Figure 5](tse_core.md): Location-wise relative abundances of the most prevalent phyla and genera in families.
-- [Inter-generational analysis](Intergeneration_analysis.Rmd) | [Figure 6](Intergeneration_analysis.md): within and between family comparison across three generations.
-- [supplementary](supplementary.Rmd) | [supplementary figure 1](supplementary.md): Family-wise inter-generational analysis.
+- [diversity analysis](diversity(alpha,beta).Rmd) | [Figure 2](diversity-alpha,beta-.md): alpha diversity using Shannon index, beta diversity with PERMANOVA, PCoA and dbRDA for all co-factors. 
+- [most prevalent microbiome](tse_core.Rmd) | [Figure 3](tse_core.md): relative abundances of the most prevalent phyla and genera in families across geographical locations.
+- [Inter-generational analysis](Intergeneration_analysis.Rmd) | [Figure 4](Intergeneration_analysis.md): within and between family comparison across three generations.
+- [Family-specific microbiome variation](DAA_Family.Rmd) | [Table 5](DAA_Family.md): Differential abundance analysis with ancombc2 for family.
+- [supplementary](DAA_location.Rmd) | [supplementary figure 1](DAA_location.md): Differential abundance analysis with ancombc2 for locations.
+- [supplementary](tse_core.Rmd) | [supplementary figure 2](tse_core.md): Individual-wise relative abundances of most prevalent genera in the families across locations.
+- [supplementary](supplementary.Rmd) | [supplementary figure 3](supplementary.md): Family-wise inter-generational analysis.
 
 ## Authors
 Renuka Potbhare, Ameeta Ravikumar, Eveliina Munukka, Richa Ashma and Leo Lahti
