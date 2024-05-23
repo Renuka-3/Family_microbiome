@@ -41,7 +41,7 @@ To start running the respective analysis first create the TSE object and then us
 rmarkdown::render("FILENAME.Rmd", output_format="md_document")
 ```
 
-- [diversity analysis](diversity(alpha,beta).Rmd) | [Figure 2](diversity(alpha,beta).md): alpha diversity estimated using Shannon diversity index for all co-factors. 
+- [diversity analysis](diversity(alpha,beta).Rmd) | [Figure 2](diversity-alpha,beta-.md): alpha diversity estimated using Shannon diversity index for all co-factors. 
 - [Beta diversity analysis](tse_beta.Rmd) | [Figure 3](tse_beta.md): PCoA and PERMANOVA analysis was carried out with confounding factors.
 - [dbRDA](RDA.Rmd) | [Figure 4](RDA.md): distance-based Redundancy analysis performed for confounding factors.
 - [most prevalent microbiome](tse_core.Rmd) | [Figure 5](tse_core.md): Location-wise relative abundances of the most prevalent phyla and genera in families.
