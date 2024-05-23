@@ -44,7 +44,7 @@ rmarkdown::render("FILENAME.Rmd", output_format="md_document")
 - [diversity analysis](diversity(alpha,beta).Rmd) | [Figure 2](diversity-alpha,beta-.md): alpha diversity using Shannon index, beta diversity with PERMANOVA, PCoA and dbRDA for all co-factors. 
 - [most prevalent microbiome](tse_core.Rmd) | [Figure 3](tse_core.md): relative abundances of the most prevalent phyla and genera in families across geographical locations.
 - [Inter-generational analysis](Intergeneration_analysis.Rmd) | [Figure 4](Intergeneration_analysis.md): within and between family comparison across three generations.
-- [Family-specific microbiome variation](DAA_Family.Rmd) | [Figure 4](DAA_Family.md): Differential abundance analysis with ancombc2 for family.
+- [Family-specific microbiome variation](DAA_Family.Rmd) | [Table 5](DAA_Family.md): Differential abundance analysis with ancombc2 for family.
 - [supplementary](DAA_location.Rmd) | [supplementary figure 1](DAA_location.md): Differential abundance analysis with ancombc2 for locations.
 - [supplementary](tse_core.Rmd) | [supplementary figure 2](tse_core.md): Individual-wise relative abundances of most prevalent genera in the families across locations.
 - [supplementary](supplementary.Rmd) | [supplementary figure 3](supplementary.md): Family-wise inter-generational analysis.
